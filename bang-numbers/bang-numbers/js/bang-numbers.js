@@ -106,11 +106,6 @@ var is_number_component = (function() {
 }());
 
 
-function numbers_text_to_numbers2(text) {
-  return [1000, 2000, 3000, 5000, 6000];
-}
-
-
 function bang_numbers(numbers, container) {
   console.log(numbers);
   var html = '<table class="table table-bordered table-striped table-condensed">\n';
@@ -125,8 +120,15 @@ function bang_numbers(numbers, container) {
   html += "</thead>\n";
 
   html += "<tbody>\n";
-  html += make_table_row_html("Number", numbers, "hi");
-  html += make_table_row_html("Acc.<br/>Sum", get_accumulated_sums(numbers));
+  html += make_table_row_html("Number", numbers, "The numbers parsed.");
+  var acc_sum_help = "Accumulated sums. 1st column is the 1st number;"
+    + " 2nd column is the sum of 1st and 2nd numbers;"
+    + " 3rd column is the sum of 1st to 3rd numbers, etc.";
+  html += make_table_row_html(
+    "Acc.<br/>Sum",
+    get_accumulated_sums(numbers),
+    acc_sum_help
+  );
   html += make_table_row_html("Acc.<br/>Diff.", get_accumulated_diffs(numbers));
   html += make_table_row_html("Product", get_product(numbers));
   html += make_table_row_html("Quotient", get_quotient(numbers));
@@ -327,14 +329,14 @@ function get_projected_numbers(numbers) {
  * returned.
  *
  * The three number are:
- * Principle, annual interest rate in percentage, number of years
+ * Principle, annual interest rate in fraction, number of years
  *
  * Because a mortgage payment is just one value, the returned array from this
  * function always has numbers.length items with the third position being the
  * payment , while the rest are empty strings.
  *
  * NPER = Years * 12
- * rate = interest rate in percentage / 100 / 12
+ * rate = interest rate in fraction / 12
  *
  * If rate is not 0
  * ----------------
@@ -351,7 +353,7 @@ function get_mortgage_payment(numbers) {
 
   if (numbers.length == 3) {
     var p = numbers[0];
-    var rate = numbers[1] / 100 / 12;
+    var rate = numbers[1] / 12;
     var n = numbers[2] * 12;
 
     if (rate === 0) {
