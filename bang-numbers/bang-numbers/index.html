@@ -18,18 +18,40 @@
   </head>
   <body>
   <div class="container">
-    <form role="form">
-      <div class="form-group">
-        <input type="text" id="numbers-text-input" class="form-control" />
+    <!-- Nav pills -->
+    <ul class="nav nav-pills" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#home" data-toggle="pill">Home</a>
+      </li>
+      <li role="presentation">
+        <a href="#about" data-toggle="pill">About</a>
+      </li>
+    </ul>
+
+    <!-- Pill panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="home">
+        <form role="form">
+          <div class="form-group">
+            <input type="text" id="numbers-text-input" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <button id="bang-button" class="btn btn-default">Bang!</button>
+            <button id="clear-button" class="btn btn-default">Clear</button>
+          </div>
+        </form>
+
+        <div id="output-div" class="table-responsive">
+        </div>
       </div>
 
-      <div class="form-group">
-        <button id="bang-button" class="btn btn-default">Bang!</button>
-        <button id="clear-button" class="btn btn-default">Clear</button>
+      <div role="tabpanel" class="tab-pane" id="about">
+        <dl>
+          <dt>Contact</dt>
+          <dd>htaihm@gmail.com</dd>
+        </dl>
       </div>
-    </form>
-
-    <div id="output-div" class="table-responsive">
     </div>
   </div>
 
