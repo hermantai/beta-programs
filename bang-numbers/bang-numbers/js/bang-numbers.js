@@ -376,8 +376,10 @@ function get_mortgage_payment(numbers) {
  * [A, A * rate, A * rate**2, A * rate**3,...A * rate**n]
  **/
 function get_geometric_series(numbers) {
-  var nums = [];
+  var nums = create_array_with_repeated_items("", numbers.length);
+
   if (numbers.length == 3 && numbers[2] >= 0 && numbers[2] <= 30) {
+    nums = [];
     var a = numbers[0];
     var r = numbers[1];
     var n = Math.floor(numbers[2]);
@@ -399,18 +401,21 @@ function get_geometric_series(numbers) {
  * S = A * (1 + rate + rate ** 2 + ... + rate ** n)
  **/
 function get_geometric_series_sum(numbers) {
-  var sum = 0;
+  var nums = create_array_with_repeated_items("", numbers.length);
+
   if (numbers.length == 3 && numbers[2] >= 0 && numbers[2] <= 30) {
+    var sum = 0;
     var a = numbers[0];
     var r = numbers[1];
     var n = Math.floor(numbers[2]);
+
     for (var i = 0; i < n; i++) {
       sum += a * Math.pow(r, i);
     }
+
+    nums[2] = sum;
   }
 
-  var nums = create_array_with_repeated_items("", numbers.length);
-  nums[2] = sum;
   return nums;
 }
 
