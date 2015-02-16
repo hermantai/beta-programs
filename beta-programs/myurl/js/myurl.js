@@ -15,6 +15,7 @@ function ends_with(str, suffix) {
   return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
+
 function setup_components() {
   var smart_urls = [
     {
@@ -90,20 +91,21 @@ function setup_components() {
       };
     })(smart_url, input_element);
 
-    var submit_element = $(
-      '<button type="submit" class="btn btn-default">{0}</button>'.format(smart_url['name'])
-    );
-    submit_element.click(redirect_func);
-    form_group.append(submit_element);
-
     var redirect_link = $(
       '<a href="#">{0}</a>'.format(smart_url['name'])
     );
     redirect_link.click(redirect_func);
     form_group.append(redirect_link);
 
+    var submit_element = $(
+      '<button type="submit" class="btn btn-default">{0}</button>'.format(smart_url['name'])
+    );
+    submit_element.click(redirect_func);
+    form_group.append(submit_element);
+
     container.append(form);
   }
 }
+
 
 $(document).ready(setup_components);
