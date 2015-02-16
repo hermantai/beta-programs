@@ -12,6 +12,22 @@ handlers:
 - url: /bang-numbers
   static_dir: bang-numbers
 
+- url: /myurl
+  static_dir: myurl
+
+- url: /
+  static_files: index.html
+  upload: index.html
+
+- url: /fonts
+  static_dir: fonts
+
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
+
 - url: .*
   script: main.app
 
