@@ -446,6 +446,13 @@ function create_array_with_repeated_items(item, num) {
 }
 
 
+function log_to_status(msg) {
+  return;  // comment this line out for debugging appcache if needed
+  var ele = document.getElementById("status-box");
+  ele.innerHTML += "<br />\n" + msg;
+}
+
+
 // The reason that we want to run the window.onload function only if the
 // #numbers-text element exists is that this file maybe loaded by jasmine,
 // which does not have the html element.
@@ -455,6 +462,7 @@ function create_array_with_repeated_items(item, num) {
     console.log("No #numbers-text element");
     return;
   }
+
   $(document).ready(
     function () {
       var process_func = function() {
@@ -497,6 +505,18 @@ function create_array_with_repeated_items(item, num) {
       );
 
       numbers_text_input.focus();
+
+      // Check if a new cache is available on page load.
+      var events = ["updateready", "cached", "checking", "downloading",
+        "error","noupdate", "obsolete","progress"];
+
+      for (var i=0; i < events.length; i++) {
+        var j = i;
+        window.applicationCache.addEventListener(events[j], function(e) {
+          log_to_status("event: " + events[j]);
+          log_to_status("status is : " + window.applicationCache.status);
+        }, false);
+      }
     }
   );
 })();

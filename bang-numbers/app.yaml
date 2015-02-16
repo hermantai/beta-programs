@@ -9,6 +9,11 @@ handlers:
   static_files: bang-numbers-favicon.png
   upload: bang-numbers-favicon\.png
 
+- url: /bang-numbers/(.*)\.manifest
+  static_files: bang-numbers/\1.manifest
+  upload: bang-numbers/(.*)\.manifest
+  mime_type: text/cache-manifest
+
 - url: /bang-numbers
   static_dir: bang-numbers
 
