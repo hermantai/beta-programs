@@ -6,8 +6,8 @@ threadsafe: yes
 
 handlers:
 - url: /favicon\.ico
-  static_files: bang-numbers-favicon.png
-  upload: bang-numbers-favicon\.png
+  static_files: favicon.ico
+  upload: favicon.ico
 
 - url: /bang-numbers
   static_dir: bang-numbers
