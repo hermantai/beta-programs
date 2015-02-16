@@ -1,4 +1,4 @@
-application: bang-numbers
+application: beta-programs
 version: 1
 runtime: python27
 api_version: 1
@@ -8,11 +8,6 @@ handlers:
 - url: /favicon\.ico
   static_files: bang-numbers-favicon.png
   upload: bang-numbers-favicon\.png
-
-- url: /bang-numbers/(.*)\.manifest
-  static_files: bang-numbers/\1.manifest
-  upload: bang-numbers/(.*)\.manifest
-  mime_type: text/cache-manifest
 
 - url: /bang-numbers
   static_dir: bang-numbers
