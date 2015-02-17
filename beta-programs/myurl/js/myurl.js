@@ -74,12 +74,12 @@ function setup_components() {
       'url': 'http://finance.yahoo.com/mb/%s/',
     },
     {
-      'name': 'Google Finance',
-      'url': 'https://www.google.com/finance?q=%s',
+      'name': 'HK Finance Yahoo',
+      'url': 'https://hk.finance.yahoo.com/q?s=%s.HK',
     },
     {
-      'name': 'Euros in USD',
-      'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
+      'name': 'Google Finance',
+      'url': 'https://www.google.com/finance?q=%s',
     },
     {
       'name': 'Morningstar Financials',
@@ -88,6 +88,18 @@ function setup_components() {
     {
       'name': 'Morningstar Key Ratios',
       'url': 'http://financials.morningstar.com/ratios/r.html?t=%s&region=USA&culture=en-us',
+    },
+    {
+      'name': 'Seeking Alpha',
+      'url': 'http://seekingalpha.com/symbol/%s',
+    },
+    {
+      'name': 'Xueqiu',
+      'url': 'http://xueqiu.com/S/%s',
+    },
+    {
+      'name': 'Euros in USD',
+      'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
     },
     {
       'name': 'USD in CNY',
