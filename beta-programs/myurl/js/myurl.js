@@ -113,7 +113,7 @@ function setup_components() {
 
   var hide_admin_urls = ends_with(window.location.href, "?reveal_all=true");
   var container = $('#my-urls-container');
-  var text_input_elements = [];
+  var text_inputs = [];
 
   for (var i = 0; i < smart_urls.length; i++) {
     var smart_url = smart_urls[i];
@@ -123,7 +123,7 @@ function setup_components() {
     }
 
     var form = $(
-      '<form id="{0}" role="form" class="form-inline"></form>'.format(
+      '<form id="{0}" role="form" class="form-horizontal"></form>'.format(
         smart_url['name']
       )
     );
@@ -131,52 +131,64 @@ function setup_components() {
     var form_group = $('<div class="form-group"></div>');
     form.append(form_group);
 
-    var input_element_id = smart_url['name'] + "_input";
-    var input_element = $(
+    var input_wrapper = $('<div class="col-xs-4 col-md-2"></div>');
+    var text_input_id = smart_url['name'] + "_input";
+    var text_input = $(
       '<input type="text" name="{0}" id="{0}" class="form-control" />'.format(
-        input_element_id
+        text_input_id
       )
     );
-    input_element.keyup(
+    text_input.keyup(
       function () {
         if (myurl.settings.is_sync_text_inputs) {
           // Iterate through all text input elements
-          // Note that text_input_elements is defined at the beginning of
+          // Note that text_inputs is defined at the beginning of
           // setup_components function, so it containx all text input elements
           // when the following code runs.
           var text_value = this.value;
-          for (var j = 0; j < text_input_elements.length; j++) {
-            text_input_elements[j].val(text_value);
+          for (var j = 0; j < text_inputs.length; j++) {
+            text_inputs[j].val(text_value);
           }
         }
       }
     );
 
-    text_input_elements.push(input_element);
-    form_group.append(input_element);
+    text_inputs.push(text_input);
+    input_wrapper.append(text_input);
+    form_group.append(input_wrapper);
 
-    var redirect_func = (function(my_smart_url, my_input_element) {
+    var redirect_func = (function(my_smart_url, my_text_input) {
       return function (e) {
         e.preventDefault();
-        var input_value = encodeURIComponent(my_input_element.val());
+        var input_value = encodeURIComponent(my_text_input.val());
         var url = my_smart_url['url'].replace('%s', input_value);
         console.log("Going to " + url);
         window.open(url, "_blank");
-        my_input_element.focus();
+        my_text_input.focus();
       };
-    })(smart_url, input_element);
+    })(smart_url, text_input);
 
+    var redirect_link_wrapper = $('<div class="col-xs-8 col-md-4"></div>');
     var redirect_link = $(
       '<a href="#">{0}</a>'.format(smart_url['name'])
     );
     redirect_link.click(redirect_func);
-    form_group.append(redirect_link);
 
-    var submit_element = $(
-      '<button type="submit" class="btn btn-default">{0}</button>'.format(smart_url['name'])
-    );
-    submit_element.click(redirect_func);
-    form_group.append(submit_element);
+    redirect_link_wrapper.append(redirect_link);
+    form_group.append(redirect_link_wrapper);
+
+    // Put the following button back if small devices really like button more
+    //
+    // var submit_button_wrapper = $('<div class="col-xs-6 col-md-3"></div>');
+    // var submit_button = $(
+    //   '<button type="submit" class="btn btn-default">{0}</button>'.format(
+    //     smart_url['name']
+    //   )
+    // );
+    // submit_button.click(redirect_func);
+
+    // submit_button_wrapper.append(submit_button);
+    // form_group.append(submit_button_wrapper);
 
     container.append(form);
   }
