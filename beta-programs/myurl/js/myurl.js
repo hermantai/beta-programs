@@ -168,27 +168,16 @@ function setup_components() {
       };
     })(smart_url, text_input);
 
-    var redirect_link_wrapper = $('<div class="col-xs-8 col-md-4"></div>');
-    var redirect_link = $(
-      '<a href="#">{0}</a>'.format(smart_url['name'])
+    var submit_button_wrapper = $('<div class="col-xs-8 col-md-4"></div>');
+    var submit_button = $(
+      '<button type="submit" class="btn btn-default">{0}</button>'.format(
+        smart_url['name']
+      )
     );
-    redirect_link.click(redirect_func);
+    submit_button.click(redirect_func);
 
-    redirect_link_wrapper.append(redirect_link);
-    form_group.append(redirect_link_wrapper);
-
-    // Put the following button back if small devices really like button more
-    //
-    // var submit_button_wrapper = $('<div class="col-xs-6 col-md-3"></div>');
-    // var submit_button = $(
-    //   '<button type="submit" class="btn btn-default">{0}</button>'.format(
-    //     smart_url['name']
-    //   )
-    // );
-    // submit_button.click(redirect_func);
-
-    // submit_button_wrapper.append(submit_button);
-    // form_group.append(submit_button_wrapper);
+    submit_button_wrapper.append(submit_button);
+    form_group.append(submit_button_wrapper);
 
     container.append(form);
   }
