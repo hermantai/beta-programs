@@ -16,6 +16,9 @@ var myurl = {
     _fields: {
       "is_sync_text_inputs": {
         type: "boolean"
+      },
+      "is_reset_on_url_opened": {
+        type: "boolean"
       }
     },
 
@@ -24,6 +27,7 @@ var myurl = {
       this.log_settings();
 
       $("#sync-text-inputs-checkbox").prop("checked", this.is_sync_text_inputs);
+      $("#reset-on-url-opened-checkbox").prop("checked", this.is_reset_on_url_opened);
     },
 
     load_settings: function () {
@@ -164,6 +168,11 @@ function setup_components() {
         var url = my_smart_url['url'].replace('%s', input_value);
         console.log("Going to " + url);
         window.open(url, "_blank");
+
+        if (myurl.settings.is_reset_on_url_opened) {
+          my_text_input.val("");
+          my_text_input.trigger("keyup");
+        }
         my_text_input.focus();
       };
     })(smart_url, text_input);
@@ -188,6 +197,11 @@ function setup_components() {
   $("#sync-text-inputs-checkbox").change(
     function () {
       myurl.settings.set('is_sync_text_inputs', this.checked);
+    }
+  );
+  $("#reset-on-url-opened-checkbox").change(
+    function () {
+      myurl.settings.set('is_reset_on_url_opened', this.checked);
     }
   );
 }
