@@ -78,6 +78,14 @@ function setup_components() {
       'url': 'http://finance.yahoo.com/mb/%s/',
     },
     {
+      'name': 'Finance Yahoo Analyst Estimates',
+      'url': 'http://finance.yahoo.com/q/ae?s=%s+Analyst+Estimates',
+    },
+    {
+      'name': 'Finance Yahoo Insider Transactions',
+      'url': 'http://finance.yahoo.com/q/it?s=%s+Insider+Transactions',
+    },
+    {
       'name': 'HK Finance Yahoo',
       'url': 'https://hk.finance.yahoo.com/q?s=%s.HK',
     },
@@ -102,8 +110,12 @@ function setup_components() {
       'url': 'http://xueqiu.com/S/%s',
     },
     {
-      'name': 'Euros in USD',
-      'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
+      'name': 'USD in CNY',
+      'url': 'https://www.google.com/#q=%s+usd+in+cny&safe=off',
+    },
+    {
+      'name': 'USD in RUB',
+      'url': 'https://www.google.com/#q=%s+usd+in+rub&safe=off',
     },
     {
       'name': 'USD in CNY',
@@ -112,6 +124,10 @@ function setup_components() {
     {
       'name': 'CNY in USD',
       'url': 'https://www.google.com/#q=%s+cny+in+usd&safe=off',
+    },
+    {
+      'name': 'Euros in USD',
+      'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
     },
   ];
 
