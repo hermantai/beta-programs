@@ -453,6 +453,22 @@ function create_array_with_repeated_items(item, num) {
 }
 
 
+function evaluate_free_form_text(free_form_text_input, output) {
+  output.removeClass("alert-success");
+  output.removeClass("alert-danger");
+  try {
+    var val = calculator_parser.parse(free_form_text_input.val());
+    output.empty();
+    output.addClass("alert-success");
+    output.append(val);
+  } catch (ex) {
+    output.empty();
+    output.addClass("alert-danger");
+    output.append(ex);
+  }
+}
+
+
 // The reason that we want to run the window.onload function only if the
 // #numbers-text element exists is that this file maybe loaded by jasmine,
 // which does not have the html element.
@@ -485,7 +501,7 @@ function create_array_with_repeated_items(item, num) {
           if (e.keyCode === 27) {
             // escape key is pressed
             e.preventDefault();
-            numbers_text_input.val("");
+            $(this).val("");
           }
         }
       );
@@ -505,6 +521,28 @@ function create_array_with_repeated_items(item, num) {
       );
 
       numbers_text_input.focus();
+
+      var free_form_text_input = $("#free-form-text-input");
+      free_form_text_input.keyup(
+        function (e) {
+          if (e.keyCode === 27) {
+            // escape key is pressed
+            e.preventDefault();
+            $(this).val("");
+          }
+        }
+      );
+
+      $("#evaluate-button").click(
+        function (e) {
+          e.preventDefault();
+          evaluate_free_form_text(
+            free_form_text_input,
+            $("#free-form-result-output")
+          );
+
+        }
+      );
     }
   );
 })();
