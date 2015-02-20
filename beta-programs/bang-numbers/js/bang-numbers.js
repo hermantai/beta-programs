@@ -481,6 +481,32 @@ function evaluate_free_form_text(free_form_text_input, output) {
 
   $(document).ready(
     function () {
+      // Handle hashes and tabs properly
+
+      var hash = window.location.hash;
+      if (hash) {
+        var body_loc = $('body').scrollTop();
+        $('ul.nav a[href="' + hash + '"]').tab('show');
+        // It's a bug in chrome with bootstrap css that scrollTop(0) does not
+        // work properly if run in $(document).ready, so use a timeout for it.
+        window.setTimeout(
+          function() {
+            $(window).scrollTop(body_loc);
+          },
+          0
+        );
+      }
+
+      // Makes every click on a tab changing the hash
+      $('.nav-pills a').click(function (e) {
+        $(this).tab('show');
+        var body_loc = $('body').scrollTop();
+        window.location.hash = this.hash;
+        $('html,body').scrollTop(body_loc);
+      });
+
+      // Initialize the Home page components
+
       var process_func = function() {
         var numbers = numbers_text_to_numbers(numbers_text_input.val());
         bang_numbers(numbers, $("#output-div"));
@@ -521,6 +547,8 @@ function evaluate_free_form_text(free_form_text_input, output) {
       );
 
       numbers_text_input.focus();
+
+      // Initialize the Free Form page
 
       var free_form_text_input = $("#free-form-text-input");
       free_form_text_input.keyup(
