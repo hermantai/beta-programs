@@ -159,7 +159,12 @@ function setup_components() {
       )
     );
     text_input.keyup(
-      function () {
+      function (e) {
+        if (e.keyCode === 27) {
+          // escape key is pressed
+          $(this).val("");
+        }
+
         if (myurl.settings.is_sync_text_inputs) {
           // Iterate through all text input elements
           // Note that text_inputs is defined at the beginning of
