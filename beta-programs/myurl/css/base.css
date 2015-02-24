@@ -1,0 +1,5 @@
+/* Do not show the close button for a jquery dialog, use this by setting
+ * dialogClass to "no-close"  */
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
