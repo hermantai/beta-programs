@@ -218,7 +218,8 @@ function get_power(numbers) {
     function (a, b) {return Math.pow(a, b);},
     // The result of power is generally big, so we only display it if there
     // are only two numbers
-    true
+    true,
+    function (a, b) {return Math.pow(a, b) < Math.pow(10, 20);}
   );
 }
 
@@ -430,11 +431,19 @@ function get_geometric_series_sum(numbers) {
  *
  * If two_numbers_only is true, the second item is set to result of
  * binary_func only if the length of numbers is 2
+ *
+ * two_numbers_filter is a function that takes two numbers and returns true or
+ * false. If it returns false, the result is an empty string instead of using
+ * binary_func.
  **/
-function get_two_numbers_operation_items(numbers, binary_func, two_numbers_only) {
+function get_two_numbers_operation_items(numbers, binary_func, two_numbers_only, two_numbers_filter) {
   var items = create_array_with_repeated_items("", numbers.length);
 
-  if (numbers.length >= 2) {
+  if (
+    numbers.length >= 2 && (
+      !two_numbers_filter || two_numbers_filter(numbers[0], numbers[1])
+    )
+  ) {
     if (numbers.length === 2 || !two_numbers_only) {
       items[1] = binary_func(numbers[0], numbers[1]);
     }
