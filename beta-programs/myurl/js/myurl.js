@@ -87,7 +87,7 @@ function setup_components() {
     },
     {
       'name': 'HK Finance Yahoo',
-      'url': 'https://hk.finance.yahoo.com/q?s=%s.HK',
+      'url': 'https://hk.finance.yahoo.com/q?s=%s&ql=1'
     },
     {
       'name': 'Google Finance',
