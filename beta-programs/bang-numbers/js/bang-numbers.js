@@ -108,6 +108,19 @@ var is_number_component = (function() {
 
 function bang_numbers(numbers, container) {
   console.log(numbers);
+
+  var html = html_for_table_with_num_columns_equal_numbers_len(numbers);
+  html += "<hr />\n";
+  html += html_for_table_with_more_columns_than_numbers_len(numbers);
+  container.html(html);
+
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+}
+
+
+function html_for_table_with_num_columns_equal_numbers_len(numbers) {
   var html = '<table class="table table-bordered table-striped table-condensed">\n';
 
   var indices = [];
@@ -125,31 +138,77 @@ function bang_numbers(numbers, container) {
     + " 2nd column is the sum of 1st and 2nd numbers;"
     + " 3rd column is the sum of 1st to 3rd numbers, etc.";
   html += make_table_row_html(
-    "Acc.<br/>Sum",
+    "Acc. Sum",
     get_accumulated_sums(numbers),
     acc_sum_help
   );
-  html += make_table_row_html("Acc.<br/>Diff.", get_accumulated_diffs(numbers));
+  html += make_table_row_html(
+    "AccDiffs to 1st",
+    get_accumulated_diffs_to_1st_number(numbers),
+    "Accumulated differences to the 1st number"
+  );
   html += make_table_row_html("Product", get_product(numbers));
   html += make_table_row_html("Quotient", get_quotient(numbers));
   html += make_table_row_html("Power", get_power(numbers));
   html += make_table_row_html("Diff.", get_differences(numbers));
-  html += make_table_row_html("Frac. of<br/>1st No.", get_fractions_of_1st_number(numbers));
+  html += make_table_row_html(
+    "Frac. of 1st",
+    get_fractions_of_1st_number(numbers),
+    "Fractions of the 1st number"
+  );
   html += make_table_row_html("Growth.", get_growths(numbers));
-  html += make_table_row_html("Comp.<br/>Growth", get_compounded_growths(numbers));
-  html += make_table_row_html("Avg.<br/>Growth", get_average_growths(numbers));
-  html += make_table_row_html("Proj.<br/>Numbers", get_projected_numbers(numbers));
-  html += make_table_row_html("Mort.<br/>Payment", get_mortgage_payment(numbers));
-  html += make_table_row_html("Geo.<br/>Series", get_geometric_series(numbers));
-  html += make_table_row_html("Geo. S.<br/>Sum", get_geometric_series_sum(numbers));
+  html += make_table_row_html(
+    "Comp. Growth", get_compounded_growths(numbers)
+  );
+  html += make_table_row_html(
+    "Avg. Growth",
+    get_average_growths(numbers)
+  );
+  html += make_table_row_html(
+    "Mort. PMT",
+    get_mortgage_payment(numbers),
+    "Mortgage payment"
+  );
+
   html += "</tbody>\n";
+  html += '</table>\n';
 
-  html += '</table>';
-  container.html(html);
+  return html;
+}
 
-  $(function () {
-    $('[data-toggle="popover"]').popover()
-  })
+
+function html_for_table_with_more_columns_than_numbers_len(numbers) {
+  var html = '<table class="table table-bordered table-striped table-condensed">\n';
+
+  var indices = [];
+  for (var i = 0; i < numbers.length; i++) {
+    indices.push(i + 1);
+  }
+
+  html += "<thead>\n";
+  html += make_table_row_html("Index", indices);
+  html += "</thead>\n";
+
+  html += "<tbody>\n";
+
+  html += make_table_row_html("Number", numbers, "The numbers parsed.");
+  html += make_table_row_html(
+    "Proj.<br/>Numbers",
+    get_projected_numbers(numbers)
+  );
+  html += make_table_row_html(
+    "Geo.<br/>Series",
+    get_geometric_series(numbers)
+  );
+  html += make_table_row_html(
+    "Geo. S.<br/>Sum",
+    get_geometric_series_sum(numbers)
+  );
+
+  html += "</tbody>\n";
+  html += '</table>\n';
+
+  return html;
 }
 
 
@@ -158,7 +217,7 @@ function make_table_row_html(header, items, header_popover_text) {
     ? ' data-toggle="popover" title="{0}"'.format(header_popover_text)
     : "";
 
-  var row_html = "<tr><th{0}>{1}</th>".format(header_id_html, header);
+  var row_html = '<tr><th{0}>{1}</th>'.format(header_id_html, header);
   for (var i = 0; i < items.length; i++) {
     if (items[i] === "") {
       var str = "";
@@ -185,10 +244,15 @@ function get_accumulated_sums(numbers) {
 }
 
 
-function get_accumulated_diffs(numbers) {
+function get_accumulated_diffs_to_1st_number(numbers) {
   var diffs = [];
-  var diff = 0;
-  for (var i = 0; i < numbers.length; i++) {
+  if (!numbers) {
+    return diffs;
+  }
+
+  var diff = numbers[0];
+  diffs.push(diff);
+  for (var i = 1; i < numbers.length; i++) {
     diff -= numbers[i];
     diffs.push(diff);
   }
@@ -396,7 +460,8 @@ function get_geometric_series(numbers) {
 
 /**
  * Only apply to the case that there are three numbers in the given numbers
- * array with the third number is a positive integer at most 30.
+ * array with the third number is a positive integer at most 30 and the geo
+ * metric series sum does not exceed 10^20.
  *
  * The three numbers are:
  * A, rate and n. The result is an array with the same length as the given
@@ -416,7 +481,10 @@ function get_geometric_series_sum(numbers) {
       sum += a * Math.pow(r, i);
     }
 
-    nums[2] = sum;
+    if (sum < Math.pow(10, 20)) {
+      // we only want to display the result if the number is not that large
+      nums[2] = sum;
+    }
   }
 
   return nums;
