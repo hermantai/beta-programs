@@ -74,6 +74,10 @@ function setup_components() {
       'url': 'http://finance.yahoo.com/q?s=%s&ql=1',
     },
     {
+      'name': 'Finance Yahoo Historical quotes',
+      'url': 'http://finance.yahoo.com/q/hp?s=%s+Historical+Prices',
+    },
+    {
       'name': 'Finance Yahoo message board',
       'url': 'http://finance.yahoo.com/mb/%s/',
     },
