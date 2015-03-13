@@ -164,10 +164,12 @@ function html_for_table_with_num_columns_equal_numbers_len(numbers) {
     "Avg. Growth",
     get_average_growths(numbers)
   );
+  var mortgage_payment_help = "Mortgage payment using the first three numbers"
+    + " to represent 1) principle; 2) APR in fraction; 3) number of years.";
   html += make_table_row_html(
     "Mort. PMT",
     get_mortgage_payment(numbers),
-    "Mortgage payment"
+    mortgage_payment_help
   );
 
   html += "</tbody>\n";
