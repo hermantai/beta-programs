@@ -94,6 +94,10 @@ function setup_components() {
       'url': 'https://hk.finance.yahoo.com/q?s=%s&ql=1'
     },
     {
+      'name': 'Nasdaq Dividend History',
+      'url': 'http://www.nasdaq.com/symbol/%s/dividend-history'
+    },
+    {
       'name': 'Google Finance',
       'url': 'https://www.google.com/finance?q=%s',
     },
