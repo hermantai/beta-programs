@@ -137,6 +137,10 @@ function setup_components() {
       'name': 'Euros in USD',
       'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
     },
+    {
+      'name': 'Add a feed to Feedly (login to feedly in the browser, then come here and enter the feed url)',
+      'url': 'http://cloud.feedly.com/#subscription%2Ffeed%2F%s',
+    },
   ];
 
   var hide_admin_urls = ends_with(window.location.href, "?reveal_all=true");
