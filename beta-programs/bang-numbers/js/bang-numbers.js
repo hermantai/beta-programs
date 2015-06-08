@@ -172,6 +172,14 @@ function html_for_table_with_num_columns_equal_numbers_len(numbers) {
     mortgage_payment_help
   );
 
+  var mortgage_principle_help = "Mortgage principle using the first three numbers"
+    + " to represent 1) monthly payment; 2) APR in fraction; 3) number of years.";
+  html += make_table_row_html(
+    "Mort. Principle",
+    get_mortgage_principle(numbers),
+    mortgage_principle_help
+  );
+
   html += "</tbody>\n";
   html += '</table>\n';
 
@@ -430,6 +438,50 @@ function get_mortgage_payment(numbers) {
     }
 
     items[2] = payment;
+  }
+
+  return items;
+}
+
+
+/**
+ * Only apply to the case that there are three numbers in the given
+ * numbers array. Otherwise, an array of numbers.length empty strings is
+ * returned.
+ *
+ * The three number are:
+ * Monthly payment, annual interest rate in fraction, number of years
+ *
+ * Because a mortgage principle is just one value, the returned array from this
+ * function always has numbers.length items with the third position being the
+ * payment , while the rest are empty strings.
+ *
+ * NPER = Years * 12
+ * rate = interest rate in fraction / 12
+ *
+ * If rate is not 0
+ * ----------------
+ * P = PMT / ((1 + rate)^N / (((1 + rate)^N - 1) / rate))
+ *
+ * If rate = 0
+ * -----------
+ * P = PMT * NPER
+ **/
+function get_mortgage_principle(numbers) {
+  var items = create_array_with_repeated_items("", numbers.length);
+
+  if (numbers.length == 3) {
+    var payment = numbers[0];
+    var rate = numbers[1] / 12;
+    var n = numbers[2] * 12;
+
+    if (rate === 0) {
+      var p = payment * n;
+    } else {
+      var p = payment / (Math.pow(1 + rate, n) / ((Math.pow(1 + rate, n) - 1) / rate));
+    }
+
+    items[2] = p;
   }
 
   return items;
