@@ -15,9 +15,6 @@ handlers:
 - url: /myurl
   static_dir: myurl
 
-- url: /alarm
-  static_dir: alarm
-
 - url: /
   static_files: index.html
   upload: index.html
