@@ -1,0 +1,37 @@
+<html>
+<head>
+  <title>Alarm</title>
+<script>
+function check() {
+  navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+ 
+  if (!navigator.vibrate) {
+    alert('no vibration support');
+  }
+}
+
+function countdown() {
+  var ele = document.getElementById('secs');
+  var millis = parseInt(ele.value);
+  var status_ele = document.getElementById('status');
+  setTimeout(
+    function() {
+      navigator.vibrate([500, 2000, 1000]);
+      status_ele.innerHTML = "";
+    },
+    millis * 1000
+  );
+  status_ele.innerHTML = "vibrate after " + millis + " seconds";
+}
+
+</script>
+</head>
+<body onload="check()">
+  <form>
+    <label for="secs">Number of seconds before vibration</label>
+    <input type="number" name="secs" id="secs" />
+    <button onclick="countdown(); return false;">Start</button>
+  </form>
+  <div id="status"></div>
+</body>
+</html>
