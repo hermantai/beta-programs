@@ -126,16 +126,24 @@ function setup_components() {
       'url': 'https://www.google.com/#q=%s+usd+in+rub&safe=off',
     },
     {
-      'name': 'USD in CNY',
-      'url': 'https://www.google.com/#q=%s+usd+in+cny&safe=off',
+      'name': 'USD in BRL',
+      'url': 'https://www.google.com/#q=%s+usd+in+brl&safe=off',
     },
     {
       'name': 'CNY in USD',
       'url': 'https://www.google.com/#q=%s+cny+in+usd&safe=off',
     },
     {
+      'name': 'RUB in USD',
+      'url': 'https://www.google.com/#q=%s+rub+in+usd&safe=off',
+    },
+    {
       'name': 'Euros in USD',
       'url': 'https://www.google.com/#q=%s+eur+in+usd&safe=off',
+    },
+    {
+      'name': 'BRL in USD',
+      'url': 'https://www.google.com/#q=%s+brl+in+usd&safe=off',
     },
     {
       'name': 'Add a feed to Feedly (login to feedly in the browser, then come here and enter the feed url)',
