@@ -94,6 +94,10 @@ function setup_components() {
       'url': 'https://hk.finance.yahoo.com/q?s=%s&ql=1'
     },
     {
+      'name': 'Nasdaq after hours',
+      'url': 'http://www.nasdaq.com/symbol/%s/after-hours'
+    },
+    {
       'name': 'Nasdaq Dividend History',
       'url': 'http://www.nasdaq.com/symbol/%s/dividend-history'
     },
