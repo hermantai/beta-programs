@@ -201,6 +201,16 @@ var myurl = {
   },
 
   add_smart_url: function (smart_url) {
+    var that = this;
+
+    this.add_smart_url_to_db(smart_url, function(added_smart_url) {
+
+      that._smart_urls.push(added_smart_url);
+      that.add_smart_url_to_ui(added_smart_url);
+    });
+  },
+
+  add_smart_url_to_db: function(smart_url, callback_for_smart_url_added) {
     this.DB.transaction(
       function (tx) {
         tx.executeSql(
@@ -219,8 +229,10 @@ var myurl = {
             }
 
             smart_url.id = resultSet.insertId
-            myurl._smart_urls.push(smart_url);
-            myurl.add_smart_url_to_ui(smart_url);
+
+            if (callback_for_smart_url_added) {
+              callback_for_smart_url_added(smart_url);
+            }
           },
           myurl._generic_websql_error_handler
         );
