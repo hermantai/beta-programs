@@ -258,15 +258,8 @@ var myurl = {
   },
 
   remove_smart_url_from_ui: function(id) {
-    [$('#edit-smart-urls-list li'), $('#my-urls-container form')].forEach(
-      function (elements) {
-        elements.each(function(index, item) {
-          if ($(item).attr('smart-url-id') === id) {
-            $(item).remove();
-          }
-        });
-      }
-    );
+    myurl.home_page.remove_smart_url(id);
+    myurl.config_url_page.remove_smart_url(id);
   },
 
   remove_smart_url_from_db: function (id, callback_for_smart_url_removed) {
@@ -436,6 +429,14 @@ myurl.home_page = {
     form_group.append(submit_button_wrapper);
 
     container.append(form);
+  },
+
+  remove_smart_url: function(id) {
+    $('#my-urls-container form').each(function(index, form_item) {
+      if ($(form_item).attr('smart-url-id') === id) {
+        $(form_item).remove();
+      }
+    });
   }
 }
 
@@ -445,6 +446,14 @@ myurl.config_url_page = {
     list_item.append($('<input type="checkbox" class="smart-url-item" />').attr('smart-url-id', smart_url.id)).attr('smart-url-id', smart_url.id);
     list_item.append(" " + smart_url.name);
     $("#edit-smart-urls-list").append(list_item);
+  },
+
+  remove_smart_url: function(id) {
+    $('#edit-smart-urls-list li').each(function(index, list_item) {
+      if ($(list_item).attr('smart-url-id') === id) {
+        $(list_item).remove();
+      }
+    });
   }
 }
 
