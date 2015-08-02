@@ -200,53 +200,6 @@ var myurl = {
 
   },
 
-  settings: {
-    init: function () {
-      this.load_settings();
-      this.log_settings();
-
-      $("#sync-text-inputs-checkbox").prop("checked", this.is_sync_text_inputs);
-      $("#reset-on-url-opened-checkbox").prop("checked", this.is_reset_on_url_opened);
-
-    },
-
-    load_settings: function () {
-      for (var field_name in this._fields) {
-        var field = this._fields[field_name];
-        var value = localStorage.getItem(field_name);
-        if (field.type === "boolean") {
-          value = value && value === "true" ? true : false;
-        }
-        this[field_name] = value;
-      }
-    },
-
-    log_settings: function () {
-      console.log("Settings:");
-      for (var field_name in this._fields) {
-        console.log("{0} -> {1}".format(field_name, this[field_name]));
-      }
-    },
-
-    set: function (field_name, value) {
-      if (!this.hasOwnProperty(field_name)) {
-        console.error("No field [{0}] in settings".format(field_name));
-      }
-
-      localStorage.setItem(field_name, value);
-      this[field_name] = value;
-    },
-
-    _fields: {
-      "is_sync_text_inputs": {
-        type: "boolean"
-      },
-      "is_reset_on_url_opened": {
-        type: "boolean"
-      }
-    }
-  },
-
   add_smart_url: function (smart_url) {
     this.DB.transaction(
       function (tx) {
@@ -358,6 +311,58 @@ var myurl = {
 
   _smart_urls: []
 };
+
+myurl.settings = (function() {
+  var _fields = {
+    "is_sync_text_inputs": {
+      type: "boolean"
+    },
+    "is_reset_on_url_opened": {
+      type: "boolean"
+    }
+  }
+
+  var obj = {
+    init: function () {
+      this.load_settings();
+      this.log_settings();
+
+      $("#sync-text-inputs-checkbox").prop("checked", this.is_sync_text_inputs);
+      $("#reset-on-url-opened-checkbox").prop("checked", this.is_reset_on_url_opened);
+
+    },
+
+    load_settings: function () {
+      for (var field_name in _fields) {
+        var field = _fields[field_name];
+        var value = localStorage.getItem(field_name);
+        if (field.type === "boolean") {
+          value = value && value === "true" ? true : false;
+        }
+        this[field_name] = value;
+      }
+    },
+
+    log_settings: function () {
+      console.log("Settings:");
+      for (var field_name in _fields) {
+        console.log("{0} -> {1}".format(field_name, this[field_name]));
+      }
+    },
+
+    set: function (field_name, value) {
+      if (!this.hasOwnProperty(field_name)) {
+        console.error("No field [{0}] in settings".format(field_name));
+      }
+
+      localStorage.setItem(field_name, value);
+      this[field_name] = value;
+    },
+
+  }
+  return obj;
+})();
+
 myurl.home_page = {
   text_inputs: [],
   add_smart_url: function(smart_url) {
