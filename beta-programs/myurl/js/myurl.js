@@ -34,15 +34,84 @@ var toast = {
  *    object.
  */
 var myurl = {
-  DATABASE_NAME: "myurl",
-  DATABASE_VERSION: "1.0",
-  DATABASE_DESC: "Database for MyURL",
-  DATABASE_SIZE: 1024 * 1024,
-  DB: null,
+  init: function () {
+    this.settings.init();
+  },
 
-  TABLE_SMART_URL: "smart_url",
+  add_smart_url: function (smart_url) {
+    var that = this;
 
-  DEFAULT_SMART_URLS: [
+    this.db.add_smart_url(smart_url, function(added_smart_url) {
+
+      that._smart_urls.push(added_smart_url);
+      that.add_smart_url_to_ui(added_smart_url);
+    });
+  },
+
+  add_smart_url_to_ui: function(smart_url) {
+    myurl.home_page.add_smart_url(smart_url);
+    myurl.config_url_page.add_smart_url(smart_url);
+  },
+
+  get_all_smart_urls: function () {
+    return this._smart_urls;
+  },
+
+  remove_smart_url: function (id) {
+    var index = -1;
+    for (var i = 0; i < this._smart_urls.length; i++) {
+      if (this._smart_urls[i].id.toString() === id) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index === -1) {
+      toast.show("Remove URL", "{0} does not exist".format(name), toast.ERROR);
+      return;
+    }
+
+    this._smart_urls.splice(index, 1);
+
+    this.remove_smart_url_from_ui(id);
+    this.db.remove_smart_url(id);
+  },
+
+  remove_smart_url_from_ui: function(id) {
+    myurl.home_page.remove_smart_url(id);
+    myurl.config_url_page.remove_smart_url(id);
+  },
+
+  /**
+   * Returns the json parsed or null if not parsed successfully.
+   */
+  save_parse_json: function(s) {
+      try {
+        json = JSON.parse(s);
+        return json;
+      } catch(e) {
+        toast.show('Invalid json', e, toast.ERROR);
+        return null;
+      }
+  },
+
+  download_json: function(json, filename) {
+      var encoded_json = encodeURIComponent(json);
+      var anchor = $('<a href="data:text;charset=utf-8,{0}" download="{1}">Download {1}</a>'.format(encoded_json, filename));
+      $('#download-link-span').html(anchor);
+  },
+
+  _smart_urls: []
+};
+
+myurl.db = (function() {
+  var _DATABASE_NAME = "myurl";
+  var _DATABASE_VERSION = "1.0";
+  var _DATABASE_DESC = "Database for MyURL";
+  var _DATABASE_SIZE = 1024 * 1024;
+  var _TABLE_SMART_URL = "smart_url";
+
+  var _DEFAULT_SMART_URLS = [
     {
       'name': 'Finance Yahoo',
       'url': 'http://finance.yahoo.com/q?s=%s&ql=1',
@@ -127,195 +196,132 @@ var myurl = {
       'name': 'Add a feed to Feedly (login to feedly in the browser, then come here and enter the feed url)',
       'url': 'http://cloud.feedly.com/#subscription%2Ffeed%2F%s',
     },
-  ],
+  ];
 
-  init: function () {
-    this.settings.init();
-  },
+  var _GENERIC_SQL_HANDLER = function (tx, error) {
+    toast.show("Web SQL Error", error.message);
+  };
 
-  setup_db: function (callback_for_setup_db_finished) {
-    this.DB = openDatabase(
-      this.DATABASE_NAME,
-      this.DATABASE_VERSION,
-      this.DATABASE_DESC,
-      this.DATABASE_SIZE
-    );
+  var _db_handle = null;
 
-    this.DB.transaction(
-      function (tx) {
-        var create_table_sql = (
-            'CREATE TABLE IF NOT EXISTS {0} ('
-              + 'id INTEGER PRIMARY KEY'
-              + ', name STRING'
-              + ', url STRING'
-              + ')'
-        ).format(myurl.TABLE_SMART_URL);
+  var obj = {
+    init: function (callback_for_setup_db_finished) {
+      _db_handle = openDatabase(
+        _DATABASE_NAME,
+        _DATABASE_VERSION,
+        _DATABASE_DESC,
+        _DATABASE_SIZE
+      );
 
-        tx.executeSql(
-          create_table_sql,
-          [],
-          null,
-          myurl._generic_websql_error_handler
-        );
-      }
-    );
+      _db_handle.transaction(
+        function (tx) {
+          var create_table_sql = (
+              'CREATE TABLE IF NOT EXISTS {0} ('
+                + 'id INTEGER PRIMARY KEY'
+                + ', name STRING'
+                + ', url STRING'
+                + ')'
+          ).format(_TABLE_SMART_URL);
 
-    this.load_smart_urls_from_db(
-      function () {
-        // Load default smart url's if there is none in the db
-        if (myurl._smart_urls.length === 0) {
-          for (var i = 0; i < myurl.DEFAULT_SMART_URLS.length; i++) {
-            myurl.add_smart_url(myurl.DEFAULT_SMART_URLS[i]);
+          tx.executeSql(
+            create_table_sql,
+            [],
+            null,
+            _GENERIC_SQL_HANDLER
+          );
+        }
+      );
+
+      this.load_smart_urls(
+        function () {
+          // Load default smart url's if there is none in the db
+          if (myurl._smart_urls.length === 0) {
+            for (var i = 0; i < _DEFAULT_SMART_URLS.length; i++) {
+              myurl.add_smart_url(_DEFAULT_SMART_URLS[i]);
+            }
+          }
+
+          if (callback_for_setup_db_finished) {
+            callback_for_setup_db_finished();
           }
         }
+      );
+    },  // init
 
-        if (callback_for_setup_db_finished) {
-          callback_for_setup_db_finished();
+    load_smart_urls: function (callback_for_smart_urls_loaded) {
+      _db_handle.transaction(
+        function (tx) {
+          tx.executeSql(
+            "SELECT * FROM {0} ORDER BY id".format(_TABLE_SMART_URL),
+            [],
+            function (tx, results) {
+              var length = results.rows.length;
+              console.log("Has {0} smart urls in storage".format(length));
+              for (var i = 0; i < length; i++) {
+                myurl._smart_urls.push(results.rows.item(i));
+              }
+
+              if (callback_for_smart_urls_loaded) {
+                callback_for_smart_urls_loaded();
+              }
+            },
+            _GENERIC_SQL_HANDLER
+          );
         }
-      }
-    );
-  },
+      );
+    },  // load_smart_urls
 
-  load_smart_urls_from_db: function (callback_for_smart_urls_loaded) {
-    this.DB.transaction(
-      function (tx) {
-        tx.executeSql(
-          "SELECT * FROM {0} ORDER BY id".format(myurl.TABLE_SMART_URL),
-          [],
-          function (tx, results) {
-            var length = results.rows.length;
-            console.log("Has {0} smart urls in storage".format(length));
-            for (var i = 0; i < length; i++) {
-              myurl._smart_urls.push(results.rows.item(i));
-            }
+    add_smart_url: function(smart_url, callback_for_smart_url_added) {
+      _db_handle.transaction(
+        function (tx) {
+          tx.executeSql(
+            'INSERT INTO {0}(name, url) values(?, ?)'.format(_TABLE_SMART_URL),
+            [smart_url.name, smart_url.url],
+            function(tx, resultSet) {
+              if (!resultSet.rowsAffected) {
+                toast.show(
+                  'Smart url not inserted',
+                  '{0} not inserted to db'.format(
+                    JSON.stringify(smart_url)
+                  ),
+                  toast.WARNING
+                );
+                return;
+              }
 
-            if (callback_for_smart_urls_loaded) {
-              callback_for_smart_urls_loaded();
-            }
-          },
-          myurl._generic_websql_error_handler
-        );
-      }
-    );
+              smart_url.id = resultSet.insertId
 
-  },
+              if (callback_for_smart_url_added) {
+                callback_for_smart_url_added(smart_url);
+              }
+            },
+            _GENERIC_SQL_HANDLER
+          );
+        }
+      );
+    },  // add_smart_url
 
-  add_smart_url: function (smart_url) {
-    var that = this;
+    remove_smart_url: function (id, callback_for_smart_url_removed) {
+      _db_handle.transaction(
+        function (tx) {
+          tx.executeSql(
+            'DELETE FROM {0} WHERE id = ?'.format(_TABLE_SMART_URL),
+            [id],
+            function () {
+              if (callback_for_smart_url_removed) {
+                callback_for_smart_url_removed();
+              }
+            },
+            _GENERIC_SQL_HANDLER
+          );
+        }
+      )
+    },  // remove_smart_url
 
-    this.add_smart_url_to_db(smart_url, function(added_smart_url) {
+  };  // obj to be returned for myurl.db
 
-      that._smart_urls.push(added_smart_url);
-      that.add_smart_url_to_ui(added_smart_url);
-    });
-  },
-
-  add_smart_url_to_db: function(smart_url, callback_for_smart_url_added) {
-    this.DB.transaction(
-      function (tx) {
-        tx.executeSql(
-          'INSERT INTO {0}(name, url) values(?, ?)'.format(myurl.TABLE_SMART_URL),
-          [smart_url.name, smart_url.url],
-          function(tx, resultSet) {
-            if (!resultSet.rowsAffected) {
-              toast.show(
-                'Smart url not inserted',
-                '{0} not inserted to db'.format(
-                  JSON.stringify(smart_url)
-                ),
-                toast.WARNING
-              );
-              return;
-            }
-
-            smart_url.id = resultSet.insertId
-
-            if (callback_for_smart_url_added) {
-              callback_for_smart_url_added(smart_url);
-            }
-          },
-          myurl._generic_websql_error_handler
-        );
-      }
-    );
-  },
-
-  add_smart_url_to_ui: function(smart_url) {
-    myurl.home_page.add_smart_url(smart_url);
-    myurl.config_url_page.add_smart_url(smart_url);
-  },
-
-  get_all_smart_urls: function () {
-    return this._smart_urls;
-  },
-
-  remove_smart_url: function (id) {
-    var index = -1;
-    for (var i = 0; i < this._smart_urls.length; i++) {
-      if (this._smart_urls[i].id.toString() === id) {
-        index = i;
-        break;
-      }
-    }
-
-    if (index === -1) {
-      toast.show("Remove URL", "{0} does not exist".format(name), toast.ERROR);
-      return;
-    }
-
-    this._smart_urls.splice(index, 1);
-
-    this.remove_smart_url_from_ui(id);
-    this.remove_smart_url_from_db(id);
-  },
-
-  remove_smart_url_from_ui: function(id) {
-    myurl.home_page.remove_smart_url(id);
-    myurl.config_url_page.remove_smart_url(id);
-  },
-
-  remove_smart_url_from_db: function (id, callback_for_smart_url_removed) {
-    this.DB.transaction(
-      function (tx) {
-        tx.executeSql(
-          'DELETE FROM {0} WHERE id = ?'.format(myurl.TABLE_SMART_URL),
-          [id],
-          function () {
-            if (callback_for_smart_url_removed) {
-              callback_for_smart_url_removed();
-            }
-          },
-          myurl._generic_websql_error_handler
-        );
-      }
-    )
-  },
-
-  /**
-   * Returns the json parsed or null if not parsed successfully.
-   */
-  save_parse_json: function(s) {
-      try {
-        json = JSON.parse(s);
-        return json;
-      } catch(e) {
-        toast.show('Invalid json', e, toast.ERROR);
-        return null;
-      }
-  },
-
-  download_json: function(json, filename) {
-      var encoded_json = encodeURIComponent(json);
-      var anchor = $('<a href="data:text;charset=utf-8,{0}" download="{1}">Download {1}</a>'.format(encoded_json, filename));
-      $('#download-link-span').html(anchor);
-  },
-
-  _generic_websql_error_handler: function (tx, error) {
-    toast.show("Web SQL Error", error.message);
-  },
-
-  _smart_urls: []
-};
+  return obj;
+})();  // myurl.db
 
 myurl.settings = (function() {
   var _fields = {
@@ -501,7 +507,7 @@ function setup_components() {
     $('html,body').scrollTop(body_loc);
   });
 
-  myurl.setup_db(
+  myurl.db.init(
     function () {
       // Set up the "Home" page
       var smart_urls = myurl.get_all_smart_urls();
