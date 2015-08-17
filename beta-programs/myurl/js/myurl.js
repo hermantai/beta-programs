@@ -198,6 +198,11 @@ myurl.repo = (function() {
                 _smart_urls.length === 0 &&
                 _DEFAULT_SMART_URLS.length !== 0
               ){
+                toast.show(
+                  "No pre-existing smart url's are found",
+                  "Some default smart url's are loaded to get you started.",
+                  toast.INFO
+                );
                 // Chain one callback per default smart url, so the
                 // default smart url's are added to db in serial, then we call
                 // the callback_for_setup_repo_finished at the end. The
