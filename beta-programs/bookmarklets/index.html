@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Bookmarklets</title>
+<style>
+  table#bookmarklets {
+    border-collapse: collapse;
+    padding: 0;
+    margin: 0 auto;
+  }
+  table#bookmarklets, table#bookmarklets th, table#bookmarklets td {
+    border: 1px solid black;
+  }
+  table#bookmarklets th {
+    padding: 10px 20px;
+  }
+  table#bookmarklets td {
+    padding: 10px 20px;
+  }
+
+  a.bookmarklet {
+    background: #EEEEEE;
+    display: inline-block;
+    color: inherit;
+    text-decoration: none;
+  }
+  a.bookmarklet:hover {
+    background: #FAFAFA;
+  }
+</style>
+</head>
+<body>
+  <table id="bookmarklets">
+    <tr>
+      <th>
+        Bookmarklet
+      </th>
+      <th>
+        Description
+      </th>
+    <tr>
+      <td>
+        <a
+            class="bookmarklet"
+            href="javascript: (function () { var text = prompt('Your text'); alert(text.toLocaleLowerCase());})();"
+            >
+          Lower Case
+        </a>
+      </td>
+      <td class="description">
+        Lower case your text
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a
+            class="bookmarklet"
+            href="javascript: (function () { var text = prompt('Your text'); alert(text.toLocaleUpperCase());})();"
+            >
+          Upper Case
+        </a>
+      </td>
+      <td class="description">
+        Upper case your text
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+

@@ -15,6 +15,9 @@ handlers:
 - url: /myurl
   static_dir: myurl
 
+- url: /bookmarklets
+  static_dir: bookmarklets
+
 - url: /
   static_files: index.html
   upload: index.html
