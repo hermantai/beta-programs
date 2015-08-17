@@ -98,8 +98,12 @@ myurl.repo = (function() {
       'url': 'http://finance.yahoo.com/q?s=%s&ql=1',
     },
     {
-      'name': 'Finance Yahoo Historical quotes',
+      'name': 'Finance Yahoo historical quotes',
       'url': 'http://finance.yahoo.com/q/hp?s=%s+Historical+Prices',
+    },
+    {
+      'name': 'Finance Yahoo historical quotes (dividends only)',
+      'url': 'http://finance.yahoo.com/q/hp?s=%s&g=v',
     },
     {
       'name': 'Finance Yahoo message board',
