@@ -41,43 +41,26 @@ var myurl = {
   add_smart_url: function (smart_url) {
     var that = this;
 
-    this.db.add_smart_url(smart_url, function(added_smart_url) {
-
-      that._smart_urls.push(added_smart_url);
-      that.add_smart_url_to_ui(added_smart_url);
+    this.repo.add_smart_url(smart_url, function(added_smart_url) {
+      that._add_smart_url_to_ui(added_smart_url);
     });
   },
 
-  add_smart_url_to_ui: function(smart_url) {
+  _add_smart_url_to_ui: function(smart_url) {
     myurl.home_page.add_smart_url(smart_url);
     myurl.config_url_page.add_smart_url(smart_url);
   },
 
   get_all_smart_urls: function () {
-    return this._smart_urls;
+    return this.repo.get_all_smart_urls();
   },
 
   remove_smart_url: function (id) {
-    var index = -1;
-    for (var i = 0; i < this._smart_urls.length; i++) {
-      if (this._smart_urls[i].id.toString() === id) {
-        index = i;
-        break;
-      }
-    }
-
-    if (index === -1) {
-      toast.show("Remove URL", "{0} does not exist".format(name), toast.ERROR);
-      return;
-    }
-
-    this._smart_urls.splice(index, 1);
-
-    this.remove_smart_url_from_ui(id);
-    this.db.remove_smart_url(id);
+    this._remove_smart_url_from_ui(id);
+    this.repo.remove_smart_url(id);
   },
 
-  remove_smart_url_from_ui: function(id) {
+  _remove_smart_url_from_ui: function(id) {
     myurl.home_page.remove_smart_url(id);
     myurl.config_url_page.remove_smart_url(id);
   },
@@ -104,13 +87,11 @@ var myurl = {
   _smart_urls: []
 };
 
-myurl.db = (function() {
-  var _DATABASE_NAME = "myurl";
-  var _DATABASE_VERSION = "1.0";
-  var _DATABASE_DESC = "Database for MyURL";
-  var _DATABASE_SIZE = 1024 * 1024;
-  var _TABLE_SMART_URL = "smart_url";
-
+/**
+ * Provides a Repostiory abstraction for retrieving and storing smart url's,
+ * including the in-memory caching.
+ */
+myurl.repo = (function() {
   var _DEFAULT_SMART_URLS = [
     {
       'name': 'Finance Yahoo',
@@ -198,6 +179,107 @@ myurl.db = (function() {
     },
   ];
 
+  var _smart_urls = [];
+
+  var obj = {
+    init: function (callback_for_setup_repo_finished) {
+      var that = this;
+      this.db.init(
+        function() {
+          that.db.load_smart_urls(
+            function (results) {
+              var length = results.rows.length;
+              console.log("Has {0} smart urls in storage".format(length));
+              for (var i = 0; i < length; i++) {
+                _smart_urls.push(results.rows.item(i));
+              }
+              // Load default smart url's if there is none in the db
+              if (
+                _smart_urls.length === 0 &&
+                _DEFAULT_SMART_URLS.length !== 0
+              ){
+                // Chain one callback per default smart url, so the
+                // default smart url's are added to db in serial, then we call
+                // the callback_for_setup_repo_finished at the end. The
+                // callback chain is constructed from the end.
+                last_callback = callback_for_setup_repo_finished;
+
+                for (var i =  _DEFAULT_SMART_URLS.length - 1; i > 0; i--) {
+                  // that.add_smart_url(_DEFAULT_SMART_URLS[i]);
+                  last_callback = (function (smart_url, cb) {
+                    return function () {
+                      that.add_smart_url(smart_url, cb);
+                    }
+                  })(_DEFAULT_SMART_URLS[i], last_callback);
+                }
+
+                that.add_smart_url(_DEFAULT_SMART_URLS[0], last_callback);
+              } else {
+                if (callback_for_setup_repo_finished) {
+                  callback_for_setup_repo_finished();
+                }
+              }
+            }
+          );
+        }
+      );
+    },  // myurl.repo.init
+
+    add_smart_url: function(smart_url, callback_for_smart_url_added) {
+      this.db.add_smart_url(smart_url, function(added_smart_url) {
+        _smart_urls.push(added_smart_url);
+
+        if (callback_for_smart_url_added) {
+          callback_for_smart_url_added(added_smart_url);
+        }
+      });
+    },  // myurl.repo.add_smart_url
+
+    get_all_smart_urls: function () {
+      return _smart_urls;
+    },
+
+    remove_smart_url: function (id, callback_for_smart_url_removed) {
+      this.db.remove_smart_url(
+        id,
+        function () {
+          var index = -1;
+          for (var i = 0; i < _smart_urls.length; i++) {
+            if (_smart_urls[i].id.toString() === id) {
+              index = i;
+              break;
+            }
+          }
+
+          if (index === -1) {
+            toast.show("Remove URL", "{0} does not exist".format(name), toast.ERROR);
+            return;
+          }
+
+          _smart_urls.splice(index, 1);
+          if (callback_for_smart_url_removed) {
+            callback_for_smart_url_removed();
+          }
+        }
+      );
+    },  // myurl.repo.remove_smart_url
+
+  };  // obj to be returned for myurl.repo
+
+  return obj;
+})();  // myurl.repo
+
+/**
+ * The persistent storage for smart url's. This storage is used by myurl.repo
+ * for persistent.
+ */
+myurl.repo.db = (function() {
+  var _DATABASE_NAME = "myurl";
+  var _DATABASE_VERSION = "1.0";
+  var _DATABASE_DESC = "Database for MyURL";
+  var _DATABASE_SIZE = 1024 * 1024;
+  var _TABLE_SMART_URL = "smart_url";
+
   var _GENERIC_SQL_HANDLER = function (tx, error) {
     toast.show("Web SQL Error", error.message);
   };
@@ -226,27 +308,16 @@ myurl.db = (function() {
           tx.executeSql(
             create_table_sql,
             [],
-            null,
+            function () {
+              if (callback_for_setup_db_finished) {
+                callback_for_setup_db_finished();
+              }
+            },
             _GENERIC_SQL_HANDLER
           );
         }
       );
-
-      this.load_smart_urls(
-        function () {
-          // Load default smart url's if there is none in the db
-          if (myurl._smart_urls.length === 0) {
-            for (var i = 0; i < _DEFAULT_SMART_URLS.length; i++) {
-              myurl.add_smart_url(_DEFAULT_SMART_URLS[i]);
-            }
-          }
-
-          if (callback_for_setup_db_finished) {
-            callback_for_setup_db_finished();
-          }
-        }
-      );
-    },  // init
+    },  // myurl.repo.db.init
 
     load_smart_urls: function (callback_for_smart_urls_loaded) {
       _db_handle.transaction(
@@ -255,21 +326,15 @@ myurl.db = (function() {
             "SELECT * FROM {0} ORDER BY id".format(_TABLE_SMART_URL),
             [],
             function (tx, results) {
-              var length = results.rows.length;
-              console.log("Has {0} smart urls in storage".format(length));
-              for (var i = 0; i < length; i++) {
-                myurl._smart_urls.push(results.rows.item(i));
-              }
-
               if (callback_for_smart_urls_loaded) {
-                callback_for_smart_urls_loaded();
+                callback_for_smart_urls_loaded(results);
               }
             },
             _GENERIC_SQL_HANDLER
           );
         }
       );
-    },  // load_smart_urls
+    },  // myurl.repo.db.load_smart_urls
 
     add_smart_url: function(smart_url, callback_for_smart_url_added) {
       _db_handle.transaction(
@@ -299,7 +364,7 @@ myurl.db = (function() {
           );
         }
       );
-    },  // add_smart_url
+    },  // myurl.repo.db.add_smart_url
 
     remove_smart_url: function (id, callback_for_smart_url_removed) {
       _db_handle.transaction(
@@ -316,12 +381,12 @@ myurl.db = (function() {
           );
         }
       )
-    },  // remove_smart_url
+    },  // myurl.repo.db.remove_smart_url
 
   };  // obj to be returned for myurl.db
 
   return obj;
-})();  // myurl.db
+})();  // myurl.repo.db
 
 myurl.settings = (function() {
   var _fields = {
@@ -507,7 +572,7 @@ function setup_components() {
     $('html,body').scrollTop(body_loc);
   });
 
-  myurl.db.init(
+  myurl.repo.init(
     function () {
       // Set up the "Home" page
       var smart_urls = myurl.get_all_smart_urls();
