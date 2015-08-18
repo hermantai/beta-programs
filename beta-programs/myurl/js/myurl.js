@@ -191,12 +191,13 @@ myurl.repo = (function() {
       this.db.init(
         function() {
           that.db.load_smart_urls(
-            function (results) {
-              var length = results.rows.length;
-              console.log("Has {0} smart urls in storage".format(length));
-              for (var i = 0; i < length; i++) {
-                _smart_urls.push(results.rows.item(i));
-              }
+            function (smart_urls) {
+              console.log(
+                "Has {0} smart urls in storage".format(smart_urls.length)
+              );
+              smart_urls.forEach(
+                function (smart_url) { _smart_urls.push(smart_url) }
+              );
               // Load default smart url's if there is none in the db
               if (
                 _smart_urls.length === 0 &&
@@ -228,8 +229,8 @@ myurl.repo = (function() {
                   callback_for_setup_repo_finished();
                 }
               }
-            }
-          );
+            }  // callback for that.db.load_smart_urls
+          );  // that.db.load_smart_urls(...)
         }
       );
     },  // myurl.repo.init
@@ -254,7 +255,7 @@ myurl.repo = (function() {
         function () {
           var index = -1;
           for (var i = 0; i < _smart_urls.length; i++) {
-            if (_smart_urls[i].id.toString() === id) {
+            if (_smart_urls[i].id === id) {
               index = i;
               break;
             }
@@ -280,122 +281,115 @@ myurl.repo = (function() {
 
 /**
  * The persistent storage for smart url's. This storage is used by myurl.repo
- * for persistent.
+ * for persistent. It's implemented using indexed DB:
+ * https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
  */
 myurl.repo.db = (function() {
   var _DATABASE_NAME = "myurl";
-  var _DATABASE_VERSION = "1.0";
-  var _DATABASE_DESC = "Database for MyURL";
-  var _DATABASE_SIZE = 1024 * 1024;
-  var _TABLE_SMART_URL = "smart_url";
+  var _DATABASE_VERSION = 2;
+  var _OBJECT_NAME_SMART_URL = "smart_url";
 
-  var _GENERIC_SQL_HANDLER = function (tx, error) {
-    toast.show("Web SQL Error", error.message);
+  var _GENERIC_DB_ERROR_HANDLER = function (event) {
+    toast.show("DB error: " + event.target.errorCode, event, toast.ERROR);
   };
 
+  // IDBDatabase object
   var _db_handle = null;
 
   var obj = {
     init: function (callback_for_setup_db_finished) {
-      _db_handle = openDatabase(
-        _DATABASE_NAME,
-        _DATABASE_VERSION,
-        _DATABASE_DESC,
-        _DATABASE_SIZE
-      );
+      var callback_for_setup_db_called = false;
+      // IDBOpenDBRequest object
+      var request = window.indexedDB.open(_DATABASE_NAME, _DATABASE_VERSION);
+      request.onerror = _GENERIC_DB_ERROR_HANDLER;
+      request.onsuccess = function(event) {
+        console.log("DB {0} is opened".format(_DATABASE_NAME));
+        _db_handle = event.target.result;
+        _db_handle.onerror = _GENERIC_DB_ERROR_HANDLER;
 
-      _db_handle.transaction(
-        function (tx) {
-          var create_table_sql = (
-              'CREATE TABLE IF NOT EXISTS {0} ('
-                + 'id INTEGER PRIMARY KEY'
-                + ', name STRING'
-                + ', url STRING'
-                + ')'
-          ).format(_TABLE_SMART_URL);
-
-          tx.executeSql(
-            create_table_sql,
-            [],
-            function () {
-              if (callback_for_setup_db_finished) {
-                callback_for_setup_db_finished();
-              }
-            },
-            _GENERIC_SQL_HANDLER
-          );
+        if (!callback_for_setup_db_called && callback_for_setup_db_finished) {
+          callback_for_setup_db_called = true;
+          callback_for_setup_db_finished();
         }
-      );
-    },  // myurl.repo.db.init
+      }
+      request.onupgradeneeded = function(event /* IDBVersionChangeEvent */) {
+        console.log("DB upgrade needed");
+        _db_handle = event.target.result;
+        _db_handle.onerror = _GENERIC_DB_ERROR_HANDLER;
+
+        // Only need to create any new object stores, or delete object stores
+        // from the previous version that are no longer needed.
+
+        // Create an objectStore for this database, IDBObjectStore
+        var objectStore = _db_handle.createObjectStore(
+          _OBJECT_NAME_SMART_URL,
+          {
+            keyPath: "id",
+            autoIncrement: true,
+          }
+        );
+      };
+    },   // myurl.repo.db.init
 
     load_smart_urls: function (callback_for_smart_urls_loaded) {
-      _db_handle.transaction(
-        function (tx) {
-          tx.executeSql(
-            "SELECT * FROM {0} ORDER BY id".format(_TABLE_SMART_URL),
-            [],
-            function (tx, results) {
-              if (callback_for_smart_urls_loaded) {
-                callback_for_smart_urls_loaded(results);
-              }
-            },
-            _GENERIC_SQL_HANDLER
-          );
-        }
+      var smart_urls = [];
+      // IDBTransaction
+      var tx = _db_handle.transaction(
+        // specify the scope of objects for this transaction, which can be an
+        // array of object names
+        _OBJECT_NAME_SMART_URL,
+        "readonly"
       );
-    },  // myurl.repo.db.load_smart_urls
+      // IDBObjectStore
+      var objectStore = tx.objectStore(_OBJECT_NAME_SMART_URL);
+
+      objectStore.openCursor().onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          smart_urls.push(cursor.value);
+          cursor.continue();
+        } else {
+          if (callback_for_smart_urls_loaded) {
+            callback_for_smart_urls_loaded(smart_urls);
+          }
+        }
+      };
+    },   // myurl.repo.db.load_smart_urls
 
     add_smart_url: function(smart_url, callback_for_smart_url_added) {
-      _db_handle.transaction(
-        function (tx) {
-          tx.executeSql(
-            'INSERT INTO {0}(name, url) values(?, ?)'.format(_TABLE_SMART_URL),
-            [smart_url.name, smart_url.url],
-            function(tx, resultSet) {
-              if (!resultSet.rowsAffected) {
-                toast.show(
-                  'Smart url not inserted',
-                  '{0} not inserted to db'.format(
-                    JSON.stringify(smart_url)
-                  ),
-                  toast.WARNING
-                );
-                return;
-              }
+      var request = _db_handle.transaction(
+        _OBJECT_NAME_SMART_URL, "readwrite"
+      ).objectStore(
+        _OBJECT_NAME_SMART_URL
+      ).add(smart_url);
 
-              smart_url.id = resultSet.insertId
-
-              if (callback_for_smart_url_added) {
-                callback_for_smart_url_added(smart_url);
-              }
-            },
-            _GENERIC_SQL_HANDLER
-          );
+      request.onsuccess = function (event) {
+        smart_url.id = event.target.result;
+        console.log("Smart url {0} added".format(JSON.stringify(smart_url)));
+        if (callback_for_smart_url_added) {
+          callback_for_smart_url_added(smart_url);
         }
-      );
-    },  // myurl.repo.db.add_smart_url
+      };
+    },   // myurl.repo.db.add_smart_url
 
     remove_smart_url: function (id, callback_for_smart_url_removed) {
-      _db_handle.transaction(
-        function (tx) {
-          tx.executeSql(
-            'DELETE FROM {0} WHERE id = ?'.format(_TABLE_SMART_URL),
-            [id],
-            function () {
-              if (callback_for_smart_url_removed) {
-                callback_for_smart_url_removed();
-              }
-            },
-            _GENERIC_SQL_HANDLER
-          );
-        }
-      )
-    },  // myurl.repo.db.remove_smart_url
+      var request = _db_handle.transaction(
+        _OBJECT_NAME_SMART_URL, "readwrite"
+      ).objectStore(
+        _OBJECT_NAME_SMART_URL
+      ).delete(id);
 
-  };  // obj to be returned for myurl.db
+      request.onsuccess = function (event) {
+        if (callback_for_smart_url_removed) {
+          callback_for_smart_url_removed();
+        }
+      };
+    },   // myurl.repo.db.remove_smart_url
+
+  };  // obj to be returned for myurl.repo.db
 
   return obj;
-})();  // myurl.repo.db
+})();
 
 myurl.settings = (function() {
   var _fields = {
@@ -525,7 +519,7 @@ myurl.home_page = {
 
   remove_smart_url: function(id) {
     $('#my-urls-container form').each(function(index, form_item) {
-      if ($(form_item).attr('smart-url-id') === id) {
+      if (Number($(form_item).attr('smart-url-id')) === id) {
         $(form_item).remove();
       }
     });
@@ -542,7 +536,7 @@ myurl.config_url_page = {
 
   remove_smart_url: function(id) {
     $('#edit-smart-urls-list li').each(function(index, list_item) {
-      if ($(list_item).attr('smart-url-id') === id) {
+      if (Number($(list_item).attr('smart-url-id')) === id) {
         $(list_item).remove();
       }
     });
@@ -618,14 +612,19 @@ function setup_components() {
             modal: true,
             buttons: {
               Yes: function() {
-                $("#edit-smart-urls-list .smart-url-item").each(
-                  function (index, item) {
-                    if($(item).is(':checked')) {
-                      myurl.remove_smart_url($(item).attr('smart-url-id'));
+                try {
+                  $("#edit-smart-urls-list .smart-url-item").each(
+                    function (index, item) {
+                      if($(item).is(':checked')) {
+                        myurl.remove_smart_url(
+                          Number($(item).attr('smart-url-id'))
+                        );
+                      }
                     }
-                  }
-                );
-                $(this).dialog("close");
+                  );
+                } finally {
+                  $(this).dialog("close");
+                }
               },
               No: function() {
                 $(this).dialog("close");
