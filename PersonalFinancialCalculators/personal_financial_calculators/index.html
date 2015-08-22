@@ -1,0 +1,633 @@
+<!DOCTYPE HTML>
+<html manifest="personal_financial_calculators.appcache">
+<head>
+<meta charset="utf-8" />
+<title>Personal Financial Calculators</title>
+<!--
+The icon calculator.ico is from 
+http://findicons.com/icon/563129/calculator?id=563173
+Designer website: http://snobawm.deviantart.com/
+-->
+<link rel="shortcut icon"
+      type="image/x-icon"
+      sizes="128x128"
+      href="my_images/calculator.ico"
+      />
+<link rel="apple-touch-icon" href="my_images/calculator.ico" />
+<link rel="stylesheet" href="personal_financial_calculators.css" />
+
+<link rel="stylesheet" href="jquery.mobile-1.4.1.min.css" />
+<script src="jquery-2.1.0.min.js"></script>
+
+<script>
+$(document).on("mobileinit", function() {
+  // iOS 7 has a bug: https://github.com/jquery/jquery-mobile/issues/6990,
+  // so using history cannot be used for "back". A workaround is to use an
+  // explicit link back to the home page.
+  //
+  // // Set "back" button option in toolbar, so the back button is added in every
+  // // header
+  // $.mobile.toolbar.prototype.options.addBackBtn = true;
+  // $.mobile.toolbar.prototype.options.backBtnText = "Back";
+  // $.mobile.defaultPageTransition = "slide";
+});
+</script>
+
+<script src="jquery.mobile-1.4.1.min.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+<div data-role="page"
+     id="main"
+     >
+
+  <div data-role="content">
+
+    <ul data-role="listview" data-inset="true" id="slots">
+      <li><a href="#saving-calculator" data-transition="slide">Saving Calculator</a></li>
+      <li><a href="#mortgage-payment-calculator" data-transition="slide">Mortgage Payment Calculator</a></li>
+      <li>
+        <a href="#monthly-contribution-calculator"
+           data-transition="slide"
+        >
+          Monthly Contribution Calculator
+        </a>
+      </li>
+      <li><a href="#npv-calculator" data-transition="slide">Net Present Value Calculator</a></li>
+      <li><a href="#loan-rate-calculator" data-transition="slide">Loan Rate Calculator</a></li>
+      <li><a href="#mortgage-amort-schedule" data-transition="slide">Mortgage Amortization Schedule</a></li>
+    </ul>
+
+    <p><small>Version: 2014-02-16 08</small></p>
+    <div id="status-console" style="font-size: 80%;"></div>
+    <button id="update-cache-button"
+            style="display: none;"
+            data-inline="true"
+            data-mini="true"
+            >
+      Update the app
+    </button>
+  
+  </div>
+</div>
+
+<div data-role="page"
+     id="saving-calculator"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Saving Calculator</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="saving-calculator-principal">Initial principal</label>
+        <input type="number"
+               name="saving-calculator-principal"
+               id="saving-calculator-principal"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="saving-calculator-deposit">Subsequent monthly deposit</label>
+        <input type="number"
+               name="saving-calculator-deposit"
+               id="saving-calculator-deposit"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="saving-calculator-return">Annual return (in %)</label>
+        <input type="number"
+               name="saving-calculator-return"
+               id="saving-calculator-return"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="saving-calculator-years">Number of years</label>
+        <input type="number"
+               name="saving-calculator-years"
+               id="saving-calculator-years"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="saving-calculator-amount">Final amount</label>
+        <input type="text"
+               name="saving-calculator-amount"
+               id="saving-calculator-amount"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="saving-calculator-calculate" type="submit">Calculate</button>
+      <button id="saving-calculator-clear" type="reset">Clear</button>
+    </form>
+  
+  </div>
+
+  <div data-role="footer" class="footer-description">
+    <p>
+Calculate the final amount saved after series of deposits at the beginning of
+each month after the first month. For example, if number of years is 1, it
+assumes the total money put in the saving is <code>the initial principal + deposits put at
+the beginning of Feb, Mar...Dec for the first year (11 of them)</code>. If the number of years is
+2, the total money put in the saving is <code>the initial principal + 23 *
+deposit</code>.
+    </p>
+    <p>
+    The final amount is calculated by two parts. The first part is for the
+    amount saved with respected to the initial principal.
+    </p>
+    <pre>
+    r = annual return / 12
+    z = 1 + annual return 
+    p = years * 12
+    
+    Amount = Principal * z ^ p
+    </pre>
+    <p>
+    The second part is for the regular monthly deposits. It uses the formula
+    of the sum of
+    the geometric series.
+    </p>
+    <pre>
+    S = ar + ar^2 ... ar^n
+    S = ar( (r^n - 1) / (r - 1) )
+    </pre>
+    <p>
+    Notice that there is the first month deposit is skipped, so we use p
+    -1 for n in formula above. There are two special cases. 1) years is 0,
+    then this second part is 0; 2) z is 0, then this second part is just
+    monthly deposit * (p - 1). Other than these two special cases, the
+    formula for total amount saved by the monthly deposits is:
+    </p>
+    <pre>
+    deposit * z * (z^(p - 1) - 1) / (z - 1)
+    </pre>
+    The Final Amount is the sum of these two parts.
+  </div>
+</div>
+
+<div data-role="page"
+     id="mortgage-payment-calculator"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Mortgage Payment Calculator</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="mortgage-payment-calculator-principal">Mortgage principal</label>
+        <input type="number"
+               name="mortgage-payment-calculator-principal"
+               id="mortgage-payment-calculator-principal"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-payment-calculator-years">Number of years</label>
+        <input type="number"
+               name="mortgage-payment-calculator-years"
+               id="mortgage-payment-calculator-years"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label
+          for="mortgage-payment-calculator-rate"
+        >
+          Annual interest rate (in %)
+        </label>
+        <input type="number"
+               name="mortgage-payment-calculator-rate"
+               id="mortgage-payment-calculator-rate"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-payment-calculator-payment">Monthly payment</label>
+        <input type="text"
+               name="mortgage-payment-calculator-payment"
+               id="mortgage-payment-calculator-payment"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="mortgage-payment-calculator-calculate" type="submit">Calculate</button>
+      <button id="mortgage-payment-calculator-clear" type="reset">Clear</button>
+    </form>
+  
+  </div>
+
+  <div data-role="footer" class="footer-description">
+    Calculate the monthly payment of a fixed rate amortized mortgage. For the
+    special case of interest rate equals 0%, the monthly payment is <code>principal
+    / p</code>. The
+    formula is:
+    <pre>
+    p = years * 12
+    monthly_rate = rate / 12
+    z = 1 + monthly_rate
+
+    monthly payment = principal * z^p * (z - 1) / (z^p - 1)
+    </pre>
+  </div>
+</div>
+
+<div data-role="page"
+     id="monthly-contribution-calculator"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Monthly Contribution Calculator</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="monthly-contribution-calculator-target">Target amount</label>
+        <input type="number"
+               name="monthly-contribution-calculator-target"
+               id="monthly-contribution-calculator-target"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="monthly-contribution-calculator-years">
+          Number of years
+        </label>
+        <input type="number"
+               name="monthly-contribution-calculator-years"
+               id="monthly-contribution-calculator-years"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label
+          for="monthly-contribution-calculator-rate"
+        >
+          Annual return (in %)
+        </label>
+        <input type="number"
+               name="monthly-contribution-calculator-rate"
+               id="monthly-contribution-calculator-rate"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="monthly-contribution-calculator-contribution">
+          Monthly contribution
+        </label>
+        <input type="text"
+               name="monthly-contribution-calculator-contribution"
+               id="monthly-contribution-calculator-contribution"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="monthly-contribution-calculator-calculate" type="submit">Calculate</button>
+      <button id="monthly-contribution-calculator-clear" type="reset">Clear</button>
+    </form>
+  
+  </div>
+
+  <div data-role="footer" class="footer-description">
+Calculate the required monthly contribution to achieve a target amount. The
+calculation assumes contributions are made at the beginning of the month. The
+formula is:
+    <pre>
+    monthly_return = return / 12
+    p = years * 12
+    monthy contribution = (target * (1 - 1 / (1 + monthly_return))) / ((1 + monthly_return)^p - 1)
+    </pre>
+  </div>
+</div>
+
+<div data-role="page"
+     id="npv-calculator"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Net Present Value Calculator</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="npv-calculator-payment">Payment</label>
+        <input type="number"
+               name="npv-calculator-payment"
+               id="npv-calculator-payment"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="npv-calculator-num">
+          Number of payments
+        </label>
+        <input type="number"
+               name="npv-calculator-num"
+               id="npv-calculator-num"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label
+          for="npv-calculator-rate"
+        >
+          Discount rate for each period
+        </label>
+        <input type="number"
+               name="npv-calculator-rate"
+               id="npv-calculator-rate"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="npv-calculator-npv">
+          Net Present Value
+        </label>
+        <input type="text"
+               name="npv-calculator-npv"
+               id="npv-calculator-npv"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="npv-calculator-calculate" type="submit">Calculate</button>
+      <button id="npv-calculator-clear" type="reset">Clear</button>
+    </form>
+  
+  </div>
+
+  <div data-role="footer" class="footer-description">
+Calculate the Net Present Value with a series of payments. It is used for
+getting a true NPV of paying something. You can use monthly payments or annual
+payments. If the payment is monthly, make sure the discount rate is monthly.
+Payments are assumed to be paid at the end of each period. For a special case
+of rate equals 0, the answer is <code>payment * number of payments</code>.
+Otherwise, the formula is:
+  <pre>
+  Remember the sum of the geometric series:
+  S = ar + ar^2 ... ar^n
+  S = ar( (r^n - 1) / (r - 1) )
+
+  So in our case:
+
+  z = 1 / (1 + rate)
+  n = number of payments
+  npv = payment * z * (z^n - 1) / (z - 1)
+  </pre>
+  </div>
+</div>
+
+<div data-role="page"
+     id="loan-rate-calculator"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Loan Rate Calculator</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="loan-rate-calculator-principal">Principal</label>
+        <input type="number"
+               name="loan-rate-calculator-principal"
+               id="loan-rate-calculator-principal"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="loan-rate-calculator-years">
+          Years
+        </label>
+        <input type="number"
+               name="loan-rate-calculator-years"
+               id="loan-rate-calculator-years"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label
+          for="loan-rate-calculator-monthly-payment"
+        >
+          Monthly payment
+        </label>
+        <input type="number"
+               name="loan-rate-calculator-monthly-payment"
+               id="loan-rate-calculator-monthly-payment"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="loan-rate-calculator-loan-rate">
+          Annual interest rate (APR)
+        </label>
+        <input type="text"
+               name="loan-rate-calculator-loan-rate"
+               id="loan-rate-calculator-loan-rate"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="loan-rate-calculator-calculate" type="submit">Calculate</button>
+      <button id="loan-rate-calculator-clear" type="reset">Clear</button>
+    </form>
+  
+  </div>
+
+  <div data-role="footer" class="footer-description">
+  <p>
+  Calculate the loan rate given the principal, number of years, and
+  the monthly payment. The process to calculate it is by keep guessing the
+  rate until it's close enough to the actual rate.
+  </p>
+  <pre>
+  tolerance = 0.001
+  min_rate = -100%
+  max_rate = 100%
+  rate = 0%  // start the guess with 0%
+  est = calculate the monthly loan payment given the inputs parameters with the
+  guessed rate
+
+  loop until we guessed 100 times or until (monthly_payment - est) is within
+  the tolerance
+      if monthly payment is greater than est, that means the guessed rate is
+      too low, so set min_rate = rate. Otherwise, set max_rate = rate
+
+      rate = (min_rate + max_rate) / 2
+      est = use the new rate to calculate the new monthly loan payment
+
+  If the difference between monthly_payment and est is greater than
+  tolerance, the result is "N/A". Otherwise, the rate we guess is good.
+  </pre>
+  </div>
+</div>
+
+<div data-role="page"
+     id="mortgage-amort-schedule"
+     >
+  <div data-role="header">
+    <!-- use $.mobile.toolbar.prototype.options.addBackBtn = true;
+    again after iOS 7 fixes the bug -->
+    <a href="#main" data-icon="back" data-transition="slide" data-direction="reverse">
+      Back
+    </a>
+    <h3>Mortgage Amortization Schedule</h3>
+  </div>
+  <div data-role="content">
+    <form>
+      <div class="ui-field-contain">
+        <label for="mortgage-amort-schedule-principal">Principal</label>
+        <input type="number"
+               name="mortgage-amort-schedule-principal"
+               id="mortgage-amort-schedule-principal"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-amort-schedule-years">
+          Number of years
+        </label>
+        <input type="number"
+               name="mortgage-amort-schedule-years"
+               id="mortgage-amort-schedule-years"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label
+          for="mortgage-amort-schedule-rate"
+        >
+          Annual interest rate (APR)
+        </label>
+        <input type="number"
+               name="mortgage-amort-schedule-rate"
+               id="mortgage-amort-schedule-rate"
+               value=""
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-amort-schedule-monthly-payment">
+          Monthly payment
+        </label>
+        <input type="text"
+               name="mortgage-amort-schedule-monthly-payment"
+               id="mortgage-amort-schedule-monthly-payment"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-amort-schedule-total-payment">
+          Total payment
+        </label>
+        <input type="text"
+               name="mortgage-amort-schedule-total-payment"
+               id="mortgage-amort-schedule-total-payment"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <div class="ui-field-contain">
+        <label for="mortgage-amort-schedule-total-interest">
+          Total interest paid
+        </label>
+        <input type="text"
+               name="mortgage-amort-schedule-total-interest"
+               id="mortgage-amort-schedule-total-interest"
+               value=""
+               readonly="true"
+               />
+      </div>
+      <button id="mortgage-amort-schedule-calculate" type="submit">Calculate</button>
+      <button id="mortgage-amort-schedule-clear" type="reset">Clear</button>
+    </form>
+  
+    <div id="mortgage-amort-schedule-draw">
+    </div>
+  </div>
+
+  <div data-role="footer" class="footer-description">
+  <p>
+  Calculate the mortgage monthly payment and draw the amortization schedule.
+  For the special case of interest rate equals 0%, the monthly payment is
+  <code>principal / p</code> in which <em>p</em> is <code>years * 12</code>.
+  The formula is:
+  <pre>
+  p = years * 12
+  monthly_rate = rate / 12
+  z = 1 + monthly_rate
+
+  monthly payment = principal * z^p * (z - 1) / (z^p - 1)
+  </pre>
+  <p>Total payment is then simply <code>monthly payment * p</code></p>
+  <p>Total interest paid is <code>total payment - principal</code></p>
+  <p>
+  The remaining mortgage balance at a particular year can be calculated by
+  </p>
+  <pre>
+  i = number of years passed after the mortgage is obtained
+  t = i * 12
+
+  For the special case of interest rate equals 0, it's principal * (p - t) / p.
+  Otherwise use the following formula
+
+  fv_orig = future value of the original balance at year i
+  fv_orig = principal * z^t
+
+  fv_annuity = future value of the annuity for the monthly payment at year t
+
+  If monthly_rate is 0, fv_annuity is monthly_payment * t. Otherwise, it's
+  obtained by sum of a geometric series.
+  fv_annuity = monthly_payment * (z^t - 1) / (z - 1)
+
+  remaining_balance = fv_orig - fv_annuity
+  </pre>
+  <p>
+  Gather the total interest paid, total principal paid, and the remaining
+  balance for each year, each row in the table can be calculated by comparing
+  the data at year i and year (i - 1). In other words, for each row
+  representing year y
+  </p>
+  <pre>
+  interest paid = total interest paid at year y - total interest paid at year y - 1
+
+  principal paid = total principal paid at year y - total principal paid at year y - 1
+
+  </pre>
+  <p>
+  Balance is the remaining balance calculated by the formula shown above
+  </p>
+  </div>
+</div>
+
+<script src="personal_financial_calculators.js"></script>
+</body>
+</html>
+
