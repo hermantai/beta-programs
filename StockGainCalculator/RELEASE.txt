@@ -1,0 +1,29 @@
+Release 0.9
+
+- Add the transactions right after choosing the files instead of right before performing calculate, so that the export functions can be used before performing calculate.
+___________________________________________________________
+Release 0.8
+
+- Minor twist to the text format and wording in the UI.
+
+- Change the name of Zecco to Penson, since Penson is a clearing firm which actually handles trade transactions for Zecco. Hence, the files exported are made by Penson. Some brokers use Penson as well, like Investrade, so the files exported from Investrade has the same format as Zecco. 
+___________________________________________________________
+Release 0.7
+- The release is now user friendly instead of developer friendly.
+___________________________________________________________
+Release 0.6 Date: 2010/10/9
+
+- Add capability to export raw transactions in xml
+- Add capability to import the raw transactions xml file
+
+____________________________________________________________
+Release 0.5 Date: 2010/9/26 16:41
+
+Bug Fixes:
+- Html export: The cost basis does not show the correct number of shares. This is because the original number of shares of the buy transaction is used instead of the number of shares that really got used for the sale.
+
+- XML export: The cost basis does not show the correct number of shares and cost per share. The number of shares has similar problem in html export. The cost per share didn't take account into commission. It is now fixed.
+____________________________________________________________
+Release 0.4
+
+- Change the code to Python 3.0
