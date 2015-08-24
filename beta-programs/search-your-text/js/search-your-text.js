@@ -1,8 +1,14 @@
+/**
+ * searchYourTextModule
+ */
 var searchYourText = (function() {
   var _search_pos = 0;
   var _prev_query = null;
 
   var obj = {
+    /**
+     * Refresh #display-div by re-copying the text from #useriput-textarea
+     */
     refreshDisplay: function () {
       $('#display-div').html("");
       var textNode = document.createTextNode($('#userinput-textarea').val());
@@ -10,6 +16,9 @@ var searchYourText = (function() {
       findAndReplace('\n', '<br />', $('#display-div')[0]);
     },
 
+    /**
+     * Remove all highlights from #display-div
+     */
     removeHighlights: function () {
       $('.highlight').each(function () {
         $(this).replaceWith(document.createTextNode($(this).text()));
@@ -17,6 +26,9 @@ var searchYourText = (function() {
       $('#display-div')[0].normalize();
     },
 
+    /**
+     * Scroll the windows to the n'th highlight
+     */
     scrollTo: function (n) {
       var highlights = $('.highlight');
       if (highlights.length !== 0) {
@@ -29,6 +41,13 @@ var searchYourText = (function() {
           $('#display-div').offset().top;
         $(window).scrollTop(offsetTop);
       }
+    },
+
+    /**
+     * Set the message for the #status-console
+     */
+    setStatusMessage: function (msg) {
+      $('#status-console').html(msg);
     },
 
     searchPos: function (pos) {
@@ -47,7 +66,7 @@ var searchYourText = (function() {
   };  // obj
 
   return obj;
-})();
+})();  // searchYourText module
 
 $(document).ready(
   function () {
@@ -92,4 +111,31 @@ $(document).ready(
       searchYourText.refreshDisplay();
       searchYourText.searchPos(0);
     });  // register userinput-textarea on change event
+
+    var appCache = window.applicationCache;
+    $(appCache).on("updateready", function(e) {
+      searchYourText.setStatusMessage(
+        "New version available"
+      );
+      $('#update-cache-button').show();
+    });
+    $(appCache).on("downloading", function(e) {
+      searchYourText.setStatusMessage(
+        "Caching this app for offline use..."
+      );
+    });
+    $(appCache).on("cached", function(e) {
+      searchYourText.setStatusMessage("");
+    });
+    var appCacheEvents = ["updateready", "cached", "checking", "downloading",
+      "error","noupdate", "obsolete","progress"];
+    for (var i = 0; i < appCacheEvents.length; i++) {
+      $(appCache).on(appCacheEvents[i], function(e) {
+        console.log("Appcache event: " + e.type);
+      });
+    }
+
+    $('#update-cache-button').click(function (e) {
+      window.location.reload();
+    });
 });  // ready

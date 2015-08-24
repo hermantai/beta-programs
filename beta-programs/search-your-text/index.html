@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html>
+<html manifest="search-your-text.appcache">
+  <html>
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,9 +22,15 @@
 <body>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
-      <form class="navbar-form navbar-left" role="search">
+      <form class="navbar-form navbar-left form-horizontal"
+        role="search">
         <div class="form-group">
-          <input type="text" id="search-input" name="search-input" placeholder="query"/>
+          <input
+              type="text"
+              id="search-input"
+              name="search-input"
+              class="form-control"
+              placeholder="query"/>
           <button id="search-button" class="btn btn-default">Search</button>
         </div>
       </form>
@@ -34,9 +41,15 @@
     <div id="display-div"></div>
     <form role="form">
       <div class="form-group">
-        <textarea id="userinput-textarea" placeholder="Paste your text here"></textarea>
+        <textarea id="userinput-textarea" class="form-control" placeholder="Paste your text here"></textarea>
       </div>
     </form>
+    <div id="status-console"></div>
+    <button id="update-cache-button"
+        class="btn btn-default"
+        >
+      Reload the app
+    </button>
   </div>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

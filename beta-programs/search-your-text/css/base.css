@@ -7,8 +7,15 @@ body {
 }
 
 #userinput-textarea {
-  width: 100%;
   height: 100px;
+}
+
+#status-console {
+  font-size: 80%;
+}
+
+#update-cache-button {
+  display: none;
 }
 
 .highlight {
