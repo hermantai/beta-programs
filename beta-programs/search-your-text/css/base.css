@@ -1,0 +1,16 @@
+/* App-specific css */
+body {
+  padding-top: 70px;
+}
+
+#display-div {
+}
+
+#userinput-textarea {
+  width: 100%;
+  height: 100px;
+}
+
+.highlight {
+  background-color: yellow;
+}

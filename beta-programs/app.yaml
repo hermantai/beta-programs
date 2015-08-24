@@ -18,6 +18,9 @@ handlers:
 - url: /bookmarklets
   static_dir: bookmarklets
 
+- url: /search-your-text
+  static_dir: search-your-text
+
 - url: /
   static_files: index.html
   upload: index.html
