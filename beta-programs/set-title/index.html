@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Set Title</title>
+</head>
+<body>
+  <p>
+    This simple page is to let you set the title of the page, so that when
+    this window is minimized in the dock (as in Mac), the title shows up when
+    you hover the app. This is most useful if you use multiple tabs in a web
+    browser, you then minimize the window containing the tabs, and you want to
+    what the tabs in the window are about when you hover the app.
+  </p>
+  <form>
+    <div>
+      <label for="set-title-input">Set Title</label>
+      <input
+          type="text"
+          id="set-title-input"
+          name="set-title-input"
+          placeholder="Enter title here" />
+          <button id="set-title-button">Set</button>
+    </div>
+    <div>
+      <label for="display-title-input">Current Title</label>
+      <input
+          type="text"
+          id="display-title-input"
+          name="display-title-input"
+          disabled="disabled" />
+    </div>
+  </form>
+
+  <script>
+    window.onload = function (e) {
+      var displayTitleInput = document.getElementById('display-title-input');
+      displayTitleInput.value = document.title;
+
+      var setTitleInput = document.getElementById('set-title-input');
+      var setTitleButton = document.getElementById('set-title-button');
+      setTitleButton.addEventListener(
+        "click",
+        function(e) {
+          e.preventDefault();
+
+          document.title = setTitleInput.value;
+          displayTitleInput.value = document.title;
+        }
+      );
+
+      setTitleInput.focus();
+    }
+  </script>
+</body>
+</html>
+

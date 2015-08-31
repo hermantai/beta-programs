@@ -21,6 +21,9 @@ handlers:
 - url: /search-your-text
   static_dir: search-your-text
 
+- url: /set-title
+  static_dir: set-title
+
 - url: /
   static_files: index.html
   upload: index.html
