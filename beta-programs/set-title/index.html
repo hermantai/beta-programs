@@ -33,9 +33,52 @@
   </form>
 
   <script>
-    window.onload = function (e) {
+    function getParams() {
+      // found in http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+      var match,
+          pl     = /\+/g,  // Regex for replacing addition symbol with a space
+          search = /([^&=]+)=?([^&]*)/g,
+          decode = function (s) {
+            return decodeURIComponent(s.replace(pl, " "));
+          },
+          query  = window.location.search.substring(1);
+
+      var urlParams = {};
+      while ((match = search.exec(query)) !== null) {
+         urlParams[decode(match[1])] = decode(match[2]);
+      }
+      return urlParams;
+    }
+
+    function setPageTitle(newTitle) {
       var displayTitleInput = document.getElementById('display-title-input');
-      displayTitleInput.value = document.title;
+      document.title = newTitle;
+      displayTitleInput.value = newTitle;
+    }
+
+    function getLocationFromTitle(title) {
+      return window.location.pathname + "?title=" + encodeURIComponent(title);
+    }
+
+    window.onload = function (e) {
+      var urlParams = getParams();
+      if (urlParams.title !== undefined) {
+        var currentTitle = urlParams.title;
+        setPageTitle(currentTitle);
+        // Set the state for this initial page, so we can set the title back
+        // later (in window.popstate event) if the user uses the "back" button
+        // to come back to this page.
+        // Note that we use replaceState, because when the user goes to this
+        // page with title "ABC", pressing the "back" button should not stay
+        // at this page (this "Set Title" web app). He/she should go back to
+        // whatever page he/she was browsing.
+        window.history.replaceState(
+          {title: currentTitle},  // the state is used for window.popstate
+                                  // event
+          currentTitle
+          /* we don't pass a new url here */
+        );
+      }
 
       var setTitleInput = document.getElementById('set-title-input');
       var setTitleButton = document.getElementById('set-title-button');
@@ -44,8 +87,29 @@
         function(e) {
           e.preventDefault();
 
-          document.title = setTitleInput.value;
-          displayTitleInput.value = document.title;
+          var newTitle = setTitleInput.value;
+          setPageTitle(newTitle);
+
+          window.history.pushState(
+            {title: newTitle},  // the state is used for window.popstate event
+            newTitle,
+            getLocationFromTitle(newTitle)
+          );
+        }
+      );
+      // When the user presses the back and forward button, the page does not
+      // reload, so we need to know the previous state and set the page
+      // accordingly.
+      window.addEventListener(
+        'popstate',
+        function(e) {
+          var state = e.state;
+
+          var originalTitle = "Set Title";
+          if (state !== null) {
+            originalTitle = state.title;
+          }
+          setPageTitle(originalTitle);
         }
       );
 
