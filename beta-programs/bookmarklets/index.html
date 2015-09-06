@@ -82,7 +82,7 @@
       <td id="note-box-title-cell">
         <a
             class="bookmarklet"
-            href="javascript: (function(){ var d = document.createElement('div'); d.setAttribute('id', 'sorno-extra-box'); d.innerHTML = '<textarea cols=50 rows=10></textarea><br /><button id=&quot;sorno-extra-box-button&quot; style=&quot;float:right&quot;>Remove</button>'; d.style.position = 'fixed'; d.style.right = 0; d.style.top = 0; d.style.border = '1px solid black'; d.style.zIndex = '999'; document.body.appendChild(d); var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);}; document.getElementById('sorno-extra-box-button').onclick=sorno_extra_box_destroy; })()"
+            href="javascript: (function(){ var d = document.createElement('div'); d.setAttribute('id', 'sorno-extra-box'); d.innerHTML = '<textarea cols=50 rows=10></textarea><br /><button id=&quot;sorno-extra-box-button&quot; style=&quot;float:right&quot;>Remove</button>'; d.style.position = 'fixed'; d.style.right = 0; d.style.top = 0; d.style.border = '1px solid black'; d.style.zIndex = '999'; document.body.appendChild(d); var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);}; document.getElementById('sorno-extra-box-button').onclick=sorno_extra_box_destroy; d.childNodes[0].focus();})()"
             >
           Note Box
         </a>
@@ -103,6 +103,7 @@
         document.body.appendChild(d);
         var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);};
         document.getElementById('sorno-extra-box-button').onclick=sorno_extra_box_destroy;
+        d.childNodes[0].focus();
         })()
         -->
 <pre>javascript: (function(){
@@ -117,6 +118,7 @@ d.style.zIndex = &#x27;999&#x27;;
 document.body.appendChild(d);
 var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);};
 document.getElementById(&#x27;sorno-extra-box-button&#x27;).onclick=sorno_extra_box_destroy;
+d.childNodes[0].focus();
 })()</pre>
       </td>
     </tr>
