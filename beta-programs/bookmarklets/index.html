@@ -24,9 +24,22 @@
     display: inline-block;
     color: inherit;
     text-decoration: none;
+    padding:10px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
   }
   a.bookmarklet:hover {
     background: #FAFAFA;
+  }
+
+  .glow {
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    -webkit-box-shadow: 0px 0px 15px 5px rgba(255, 153, 0, .75);
+    -moz-box-shadow: 0px 0px 15px 5px rgba(255, 153, 0, .75);
+    box-shadow: 0px 0px 15px 5px rgba(255, 153, 0, .75);
   }
 </style>
 </head>
@@ -40,7 +53,7 @@
         Description
       </th>
     <tr>
-      <td>
+      <td id="lower-case-title-cell">
         <a
             class="bookmarklet"
             href="javascript: (function () { var text = prompt('Your text'); alert(text.toLocaleLowerCase());})();"
@@ -53,7 +66,7 @@
       </td>
     </tr>
     <tr>
-      <td>
+      <td id="upper-case-title-cell">
         <a
             class="bookmarklet"
             href="javascript: (function () { var text = prompt('Your text'); alert(text.toLocaleUpperCase());})();"
@@ -65,7 +78,83 @@
         Upper case your text
       </td>
     </tr>
+    <tr>
+      <td id="note-box-title-cell">
+        <a
+            class="bookmarklet"
+            href="javascript: (function(){ var d = document.createElement('div'); d.setAttribute('id', 'sorno-extra-box'); d.innerHTML = '<textarea cols=50 rows=10></textarea><br /><button id=&quot;sorno-extra-box-button&quot; style=&quot;float:right&quot;>Remove</button>'; d.style.position = 'fixed'; d.style.right = 0; d.style.top = 0; d.style.border = '1px solid black'; d.style.zIndex = '999'; document.body.appendChild(d); var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);}; document.getElementById('sorno-extra-box-button').onclick=sorno_extra_box_destroy; })()"
+            >
+          Note Box
+        </a>
+      </td>
+      <td class="description">
+        Attaches an extra box on the current web page for you to take notes
+        conveniently. The code is copied verbatim below for easily seeing what happens:
+        <!--
+        javascript: (function(){
+        var d = document.createElement('div');
+        d.setAttribute('id', 'sorno-extra-box');
+        d.innerHTML = '<textarea cols=50 rows=10></textarea><br /><button id="sorno-extra-box-button" style="float:right">Remove</button>';
+        d.style.position = 'fixed';
+        d.style.right = 0;
+        d.style.top = 0;
+        d.style.border = '1px solid black';
+        d.style.zIndex = '999';
+        document.body.appendChild(d);
+        var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);};
+        document.getElementById('sorno-extra-box-button').onclick=sorno_extra_box_destroy;
+        })()
+        -->
+<pre>javascript: (function(){
+var d = document.createElement(&#x27;div&#x27;);
+d.setAttribute(&#x27;id&#x27;, &#x27;sorno-extra-box&#x27;);
+d.innerHTML = &#x27;&#x3C;textarea cols=50 rows=10&#x3E;&#x3C;/textarea&#x3E;&#x3C;br /&#x3E;&#x3C;button id=&#x22;sorno-extra-box-button&#x22; style=&#x22;float:right&#x22;&#x3E;Remove&#x3C;/button&#x3E;&#x27;;
+d.style.position = &#x27;fixed&#x27;;
+d.style.right = 0;
+d.style.top = 0;
+d.style.border = &#x27;1px solid black&#x27;;
+d.style.zIndex = &#x27;999&#x27;;
+document.body.appendChild(d);
+var sorno_extra_box_destroy = function() {d.parentElement.removeChild(d);};
+document.getElementById(&#x27;sorno-extra-box-button&#x27;).onclick=sorno_extra_box_destroy;
+})()</pre>
+      </td>
+    </tr>
   </table>
+
+<script>
+//
+// This script is for highlighting a specific part in this page. Use the
+// "highlight" param of the url to control which element to be highlighted.
+//
+
+function getParams() {
+  // found in http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  var match,
+      pl     = /\+/g,  // Regex for replacing addition symbol with a space
+      search = /([^&=]+)=?([^&]*)/g,
+      decode = function (s) {
+        return decodeURIComponent(s.replace(pl, " "));
+      },
+      query  = window.location.search.substring(1);
+
+  var urlParams = {};
+  while ((match = search.exec(query)) !== null) {
+     urlParams[decode(match[1])] = decode(match[2]);
+  }
+  return urlParams;
+}
+
+var params = getParams();
+if (params.highlight) {
+  var e = document.getElementById(params.highlight);
+  if (e) {
+    e.className += " glow";
+    document.body.scrollTop = e.offsetTop;
+  }
+}
+</script>
+
 </body>
 </html>
 
