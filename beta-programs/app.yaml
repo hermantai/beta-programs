@@ -18,6 +18,9 @@ handlers:
 - url: /bookmarklets
   static_dir: bookmarklets
 
+- url: /small-utilities
+  static_dir: small-utilities
+
 - url: /search-your-text
   static_dir: search-your-text
 
