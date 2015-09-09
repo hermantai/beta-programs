@@ -27,6 +27,9 @@ handlers:
 - url: /set-title
   static_dir: set-title
 
+- url: /timer
+  static_dir: timer
+
 - url: /
   static_files: index.html
   upload: index.html
