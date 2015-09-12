@@ -178,6 +178,14 @@ myurl.repo = (function() {
       'url': 'https://www.google.com/#q=%s+brl+in+usd&safe=off',
     },
     {
+      'name': 'TinyURL',
+      'url': 'http://tinyurl.com/%s',
+    },
+    {
+      'name': 'TinyURL (sorno-book)',
+      'url': 'http://tinyurl.com/sorno-book-%s',
+    },
+    {
       'name': 'Add a feed to Feedly (login to feedly in the browser, then come here and enter the feed url)',
       'url': 'http://cloud.feedly.com/#subscription%2Ffeed%2F%s',
     },
