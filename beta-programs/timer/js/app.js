@@ -15,7 +15,7 @@ var timer = {
   ring: function () {
     var element = $('#countdown-output')
     element.addClass("ringing-timer");
-    element.html("The timer is on!");
+    element.html("The timer went off!");
     element.toggle('pulsate');
   },  // ring
 };
@@ -32,7 +32,11 @@ $(function () {
     timer.prevInterval = setInterval(function () {
       var currentTime = new Date().getTime();
       var diff = (currentTime - startingTime) / 1000.0;
-      $('#countdown-output').html(Math.round(diff));
+      var secondsLapsed = Math.round(diff);
+      var minutesLapsed = Math.floor(secondsLapsed / 60);
+      $('#countdown-output').html(
+        minutesLapsed + " minutes " + secondsLapsed + " seconds"
+      );
       if (diff > secondsToRing) {
         timer.ring();
       }
