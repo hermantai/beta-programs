@@ -18,6 +18,13 @@ var timer = {
     element.html("The timer went off!");
     element.toggle('pulsate');
   },  // ring
+
+  stop: function () {
+    if (this.prevInterval) {
+      clearInterval(this.prevInterval);
+      this.prevInterval = null;
+    }
+  }, // stop
 };
 
 $(function () {
@@ -42,9 +49,15 @@ $(function () {
       }
     }, 1000); //  setInterval
   });  //  set-timer-button on click
+
   $('#reset-timer-button').on('click', function (e) {
     e.preventDefault();
     timer.resetTimer();
     $('#seconds-to-ring-input').val("");
+  });  // reset-timer-button on click
+
+  $('#stop-timer-button').on('click', function (e) {
+    e.preventDefault();
+    timer.stop();
   });  // reset-timer-button on click
 });  // init on load
