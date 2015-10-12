@@ -42,7 +42,7 @@ $(function () {
       var secondsLapsed = Math.round(diff);
       var minutesLapsed = Math.floor(secondsLapsed / 60);
       $('#countdown-output').html(
-        minutesLapsed + " minutes " + secondsLapsed + " seconds"
+        minutesLapsed + " minutes " + secondsLapsed % 60 + " seconds"
       );
       if (diff > secondsToRing) {
         timer.ring();
