@@ -1,5 +1,7 @@
 var timer = {
   prevInterval: null,
+  // A Date object to represent the time to ring
+  ringTime: null,
   resetTimer: function () {
     if (this.prevInterval) {
       clearInterval(this.prevInterval);
@@ -15,7 +17,9 @@ var timer = {
   ring: function () {
     var element = $('#countdown-output')
     element.addClass("ringing-timer");
-    element.html("The timer went off!");
+    element.html(
+      "The timer went off at " + this.ringTime.toLocaleTimeString()+ "!"
+    );
     element.toggle('pulsate');
   },  // ring
 
@@ -32,13 +36,18 @@ $(function () {
   $('#set-timer-button').on('click', function (e) {
     e.preventDefault();
     timer.resetTimer();
+    // The output may be gone before, so make sure it's on at the beginning.
+    $('#countdown-output').toggle(true);
+    $('#countdown-output').css('opacity', 100);
 
     var secondsToRing = parseInt($('#seconds-to-ring-input').val());
-    var startingTime = new Date().getTime();
+    var startingTimeInMillis = new Date().getTime();
+    timer.ringTime = new Date(startingTimeInMillis);
+    timer.ringTime.setSeconds(timer.ringTime.getSeconds() + secondsToRing);
 
     timer.prevInterval = setInterval(function () {
-      var currentTime = new Date().getTime();
-      var diff = (currentTime - startingTime) / 1000.0;
+      var currentTimeInMillis = new Date().getTime();
+      var diff = (currentTimeInMillis - startingTimeInMillis) / 1000.0;
       var secondsLapsed = Math.round(diff);
       var minutesLapsed = Math.floor(secondsLapsed / 60);
       $('#countdown-output').html(
