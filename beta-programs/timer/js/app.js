@@ -60,4 +60,12 @@ $(function () {
     e.preventDefault();
     timer.stop();
   });  // reset-timer-button on click
+
+  $('#seconds-to-ring-input').on('keypress', function (e) {
+    if (e.keyCode === 13) {
+      // enter key is pressed
+      e.preventDefault();
+      $('#set-timer-button').click();
+    }
+  });
 });  // init on load
