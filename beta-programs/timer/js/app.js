@@ -40,7 +40,12 @@ $(function () {
     $('#countdown-output').toggle(true);
     $('#countdown-output').css('opacity', 100);
 
-    var secondsToRing = parseInt($('#seconds-to-ring-input').val());
+    var secondsToRing = 0;
+    secondsToRing += $('#seconds-to-ring-input').val() === "" ?
+      0 : parseInt($('#seconds-to-ring-input').val());
+    secondsToRing += $('#minutes-to-ring-input').val() === "" ?
+      0 : parseInt($('#minutes-to-ring-input').val()) * 60;
+
     var startingTimeInMillis = new Date().getTime();
     timer.ringTime = new Date(startingTimeInMillis);
     timer.ringTime.setSeconds(timer.ringTime.getSeconds() + secondsToRing);
@@ -63,6 +68,7 @@ $(function () {
     e.preventDefault();
     timer.resetTimer();
     $('#seconds-to-ring-input').val("");
+    $('#minutes-to-ring-input').val("");
   });  // reset-timer-button on click
 
   $('#stop-timer-button').on('click', function (e) {
@@ -70,11 +76,17 @@ $(function () {
     timer.stop();
   });  // reset-timer-button on click
 
-  $('#seconds-to-ring-input').on('keypress', function (e) {
-    if (e.keyCode === 13) {
-      // enter key is pressed
-      e.preventDefault();
-      $('#set-timer-button').click();
-    }
-  });
+  var set_timer_inputs = [
+    $('#seconds-to-ring-input'),
+    $('#minutes-to-ring-input')
+  ];
+  for (var i = 0; i < set_timer_inputs.length; i++) {
+    set_timer_inputs[i].on('keypress', function (e) {
+      if (e.keyCode === 13) {
+        // enter key is pressed
+        e.preventDefault();
+        $('#set-timer-button').click();
+      }
+    });
+  }
 });  // init on load
