@@ -8,19 +8,26 @@ var timer = {
       this.prevInterval = null;
     }
 
-    var element = $('#countdown-output')
-    element.removeClass("ringing-timer");
-    element.html("");
-    element.stop();
+    $(document.body).removeClass('red-background');
+    $('#countdown-output').html("");
   },  // resetTimer
 
   ring: function () {
+    if (this.prevInterval) {
+      clearInterval(this.prevInterval);
+    }
+
     var element = $('#countdown-output')
-    element.addClass("ringing-timer");
     element.html(
-      "The timer went off at " + this.ringTime.toLocaleTimeString()+ "!"
+      "The timer went off at " + this.ringTime.toLocaleTimeString() + "!"
     );
-    element.toggle('pulsate');
+
+    this.prevInterval = setInterval(
+      function () {
+        $(document.body).toggleClass('red-background');
+      },
+      300
+    );  // setInterval to blink the background
   },  // ring
 
   stop: function () {
@@ -28,6 +35,7 @@ var timer = {
       clearInterval(this.prevInterval);
       this.prevInterval = null;
     }
+    $(document.body).removeClass('red-background');
   }, // stop
 };
 
@@ -36,9 +44,6 @@ $(function () {
   $('#set-timer-button').on('click', function (e) {
     e.preventDefault();
     timer.resetTimer();
-    // The output may be gone before, so make sure it's on at the beginning.
-    $('#countdown-output').toggle(true);
-    $('#countdown-output').css('opacity', 100);
 
     var secondsToRing = 0;
     secondsToRing += $('#seconds-to-ring-input').val() === "" ?
