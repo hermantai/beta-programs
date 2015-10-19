@@ -6,3 +6,10 @@
 #countdown-output.ringing-timer {
   background-color: red;
 }
+#countdown-output .remaining-duration {
+  color: blue;
+}
+
+label.form-control {
+  border:none
+}

@@ -55,8 +55,18 @@ $(function () {
       var diff = (currentTimeInMillis - startingTimeInMillis) / 1000.0;
       var secondsLapsed = Math.round(diff);
       var minutesLapsed = Math.floor(secondsLapsed / 60);
+      var secondsRemained = Math.round(
+        (timer.ringTime.getTime() - currentTimeInMillis) / 1000
+      );
+      var minutesRemained = Math.floor(secondsRemained / 60);
       $('#countdown-output').html(
-        minutesLapsed + " minutes " + secondsLapsed % 60 + " seconds"
+        minutesLapsed + " minutes " + secondsLapsed % 60 + " seconds" +
+        "<br />" +
+        '<span class="remaining-duration">' +
+        "Remaining: " + minutesRemained + " minutes " +
+        secondsRemained % 60 + " seconds" +
+        "</span>"
+
       );
       if (diff > secondsToRing) {
         timer.ring();
