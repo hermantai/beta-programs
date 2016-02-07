@@ -163,6 +163,81 @@ sorno_extra_box_textarea.focus();
         (Experimental) Maximize the email list of Gmail.
       </td>
     </tr>
+    <tr>
+      <td>
+        <a
+            class="bookmarklet"
+            href="javascript: var text = prompt(&quot;Put your text here to be appended by a date like: &quot; + new Date().toLocaleString()); var d = new Date().toLocaleString(); var appended = text + ' ' + d;  var d = document.createElement('div'); d.setAttribute('id', 'sorno-appended-output'); var textarea_html = '<textarea cols=40 rows=3 id=&quot;sorno-appended-output-textarea&quot;></textarea>'; var remove_button_html = '<button id=&quot;sorno-appended-output-remove-button&quot; style=&quot;float:right&quot;>Remove</button>'; d.innerHTML = textarea_html + &quot;<br />&quot; + remove_button_html; d.style.position = 'fixed'; d.style.right = 0; d.style.top = 0; d.style.border = '1px solid black'; d.style.zIndex = '999'; document.body.appendChild(d); var sorno_appended_output_destroy = function() {d.parentElement.removeChild(d);}; document.getElementById('sorno-appended-output-remove-button').onclick = sorno_appended_output_destroy; var sorno_appended_output_textarea = document.getElementById('sorno-appended-output-textarea'); sorno_appended_output_textarea.value = appended + &quot; (Click anywhere in this box to copy the text, and this will disappear)&quot;; var copy_on_click = function(e) {     e.preventDefault();     if (!e.clipboardData) {         alert('e.clipboardData is not present, copy this yourself!');         return;     }     e.clipboardData.setData('text/plain', appended);     sorno_appended_output_destroy(); }; sorno_appended_output_textarea.onclick = function() {;document.execCommand('copy');}; sorno_appended_output_textarea.addEventListener('copy', copy_on_click);"
+            >
+          Date appender
+        </a>
+      </td>
+      <td class="description">
+        Append a date to your text
+        <!--
+        var text = prompt("Put your text here to be appended by a date like: " + new Date().toLocaleString());
+        var d = new Date().toLocaleString();
+        var appended = text + ' ' + d;
+
+        var d = document.createElement('div');
+        d.setAttribute('id', 'sorno-appended-output');
+        var textarea_html = '<textarea cols=40 rows=3 id="sorno-appended-output-textarea"></textarea>';
+        var remove_button_html = '<button id="sorno-appended-output-remove-button" style="float:right">Remove</button>';
+        d.innerHTML = textarea_html + "<br />" + remove_button_html;
+        d.style.position = 'fixed';
+        d.style.right = 0;
+        d.style.top = 0;
+        d.style.border = '1px solid black';
+        d.style.zIndex = '999';
+        document.body.appendChild(d);
+        var sorno_appended_output_destroy = function() {d.parentElement.removeChild(d);};
+        document.getElementById('sorno-appended-output-remove-button').onclick = sorno_appended_output_destroy;
+        var sorno_appended_output_textarea = document.getElementById('sorno-appended-output-textarea');
+        sorno_appended_output_textarea.value = appended + " (Click anywhere in this box to copy the text, and this will disappear)";
+        var copy_on_click = function(e) {
+            e.preventDefault();
+            if (!e.clipboardData) {
+                alert('e.clipboardData is not present, copy this yourself!');
+                return;
+            }
+            e.clipboardData.setData('text/plain', appended);
+            sorno_appended_output_destroy();
+        };
+        sorno_appended_output_textarea.onclick = function() {;document.execCommand('copy');};
+        sorno_appended_output_textarea.addEventListener('copy', copy_on_click);
+        -->
+<pre>var text = prompt(&quot;Put your text here to be appended by a date like: &quot; + new Date().toLocaleString());
+var d = new Date().toLocaleString();
+var appended = text + ' ' + d;
+
+var d = document.createElement('div');
+d.setAttribute('id', 'sorno-appended-output');
+var textarea_html = '&lt;textarea cols=40 rows=3 id=&quot;sorno-appended-output-textarea&quot;&gt;&lt;/textarea&gt;';
+var remove_button_html = '&lt;button id=&quot;sorno-appended-output-remove-button&quot; style=&quot;float:right&quot;&gt;Remove&lt;/button&gt;';
+d.innerHTML = textarea_html + &quot;&lt;br /&gt;&quot; + remove_button_html;
+d.style.position = 'fixed';
+d.style.right = 0;
+d.style.top = 0;
+d.style.border = '1px solid black';
+d.style.zIndex = '999';
+document.body.appendChild(d);
+var sorno_appended_output_destroy = function() {d.parentElement.removeChild(d);};
+document.getElementById('sorno-appended-output-remove-button').onclick = sorno_appended_output_destroy;
+var sorno_appended_output_textarea = document.getElementById('sorno-appended-output-textarea');
+sorno_appended_output_textarea.value = appended + &quot; (Click anywhere in this box to copy the text, and this will disappear)&quot;;
+var copy_on_click = function(e) {
+    e.preventDefault();
+    if (!e.clipboardData) {
+        alert('e.clipboardData is not present, copy this yourself!');
+        return;
+    }
+    e.clipboardData.setData('text/plain', appended);
+    sorno_appended_output_destroy();
+};
+sorno_appended_output_textarea.onclick = function() {;document.execCommand('copy');};
+sorno_appended_output_textarea.addEventListener('copy', copy_on_click);</pre>
+      </td>
+    </tr>
   </table>
 
 <script>
