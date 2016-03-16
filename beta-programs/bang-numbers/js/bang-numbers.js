@@ -584,21 +584,40 @@ function create_array_with_repeated_items(item, num) {
 }
 
 
-function evaluate_free_form_text(free_form_text_input, output) {
+function evaluate_free_form_text(free_form_text_input, output, output_history) {
   output.removeClass("alert-success");
   output.removeClass("alert-danger");
+  var input_val = free_form_text_input.val().trim()
+  if (input_val === "") {
+    return;
+  }
+  var history = input_val;
   try {
-    var val = calculator_parser.parse(free_form_text_input.val());
+    var val = calculator_parser.parse(input_val);
     output.empty();
     output.addClass("alert-success");
     output.append(val);
+    history += " -> " + val;
   } catch (ex) {
     output.empty();
     output.addClass("alert-danger");
     output.append(ex);
+    history += " -> " + ex;
   }
+  output_history.prepend(history + "<br />\n");
 }
 
+function focus_element_for_tab(hash) {
+  switch (hash) {
+    case '#free-form':
+      $('#free-form-text-input').focus();
+      break;
+    case '#home':
+      // fallthrough
+    default:
+      $("#numbers-text-input").focus();
+  }
+}
 
 // The reason that we want to run the window.onload function only if the
 // #numbers-text element exists is that this file maybe loaded by jasmine,
@@ -606,7 +625,7 @@ function evaluate_free_form_text(free_form_text_input, output) {
 (function(){
   var numbers_text_input = $("#numbers-text-input");
   if (!numbers_text_input) {
-    console.log("No #numbers-text element");
+    console.log("No #numbers-text-input element");
     return;
   }
 
@@ -634,6 +653,7 @@ function evaluate_free_form_text(free_form_text_input, output) {
         var body_loc = $('body').scrollTop();
         window.location.hash = this.hash;
         $('html,body').scrollTop(body_loc);
+        focus_element_for_tab(this.hash);
       });
 
       // Initialize the Home page components
@@ -677,7 +697,6 @@ function evaluate_free_form_text(free_form_text_input, output) {
         }
       );
 
-      numbers_text_input.focus();
 
       // Initialize the Free Form page
 
@@ -697,11 +716,15 @@ function evaluate_free_form_text(free_form_text_input, output) {
           e.preventDefault();
           evaluate_free_form_text(
             free_form_text_input,
-            $("#free-form-result-output")
+            $("#free-form-result-output"),
+            $("#free-form-result-output-history")
           );
-
+          free_form_text_input.val('');
         }
       );
+
+      // Initialize the user input
+      focus_element_for_tab(window.location.hash);
     }
   );
 })();
