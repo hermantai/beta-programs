@@ -178,6 +178,14 @@ myurl.repo = (function() {
       'url': 'https://www.google.com/#q=%s+brl+in+usd&safe=off',
     },
     {
+      'name': 'Amazon',
+      'url': 'http://www.amazon.com/s/?field-keywords=%s',
+    },
+    {
+      'name': 'Amazon CN',
+      'url': 'https://www.amazon.cn/s/?field-keywords=%s',
+    },
+    {
       'name': 'TinyURL',
       'url': 'http://tinyurl.com/%s',
     },
