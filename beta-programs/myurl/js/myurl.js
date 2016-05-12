@@ -178,6 +178,11 @@ myurl.repo = (function() {
       'url': 'https://www.google.com/#q=%s+brl+in+usd&safe=off',
     },
     {
+      'name': '0005.HK to HSBC (NYSE)',
+      'url': 'https://www.google.com/#q=%s+hkd+in+usd&safe=off',
+      'preprocess': "val * 5",
+    },
+    {
       'name': 'Amazon',
       'url': 'http://www.amazon.com/s/?field-keywords=%s',
     },
@@ -314,7 +319,6 @@ myurl.repo.db = (function() {
 
   var obj = {
     init: function (callback_for_setup_db_finished) {
-      var callback_for_setup_db_called = false;
       // IDBOpenDBRequest object
       var request = window.indexedDB.open(_DATABASE_NAME, _DATABASE_VERSION);
       request.onerror = _GENERIC_DB_ERROR_HANDLER;
@@ -323,8 +327,7 @@ myurl.repo.db = (function() {
         _db_handle = event.target.result;
         _db_handle.onerror = _GENERIC_DB_ERROR_HANDLER;
 
-        if (!callback_for_setup_db_called && callback_for_setup_db_finished) {
-          callback_for_setup_db_called = true;
+        if (callback_for_setup_db_finished) {
           callback_for_setup_db_finished();
         }
       }
@@ -506,8 +509,11 @@ myurl.home_page = {
     var redirect_func = (function(my_smart_url, my_text_input) {
       return function (e) {
         e.preventDefault();
-        var input_value = encodeURIComponent(my_text_input.val());
-        var url = my_smart_url['url'].replace('%s', input_value);
+        var val = encodeURIComponent(my_text_input.val());
+        if ('preprocess' in my_smart_url) {
+          val = eval(my_smart_url.preprocess)
+        }
+        var url = my_smart_url['url'].replace('%s', val);
         console.log("Going to " + url);
         window.open(url, "_blank");
 
