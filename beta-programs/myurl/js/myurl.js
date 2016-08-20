@@ -118,10 +118,6 @@ myurl.repo = (function() {
       'url': 'http://finance.yahoo.com/q/it?s=%s+Insider+Transactions',
     },
     {
-      'name': 'HK Finance Yahoo',
-      'url': 'https://hk.finance.yahoo.com/q?s=%s&ql=1'
-    },
-    {
       'name': 'Nasdaq after hours',
       'url': 'http://www.nasdaq.com/symbol/%s/after-hours'
     },
@@ -146,12 +142,24 @@ myurl.repo = (function() {
       'url': 'http://seekingalpha.com/symbol/%s',
     },
     {
+      'name': 'US SEC',
+      'url': 'https://www.sec.gov/cgi-bin/browse-edgar?CIK=%s',
+    },
+    {
       'name': 'Xueqiu',
       'url': 'http://xueqiu.com/S/%s',
     },
     {
-      'name': 'US SEC',
-      'url': 'https://www.sec.gov/cgi-bin/browse-edgar?CIK=%s',
+      'name': 'HK Finance Yahoo',
+      'url': 'https://hk.finance.yahoo.com/q?s=%s&ql=1'
+    },
+    {
+      'name': 'aastocks',
+      'url': 'http://www.aastocks.com/en/ltp/rtquote.aspx?symbol=%s'
+    },
+    {
+      'name': '理財通',
+      'url': 'http://www.etnet.com.hk/www/tc/stocks/realtime/quote.php?code=%s'
     },
     {
       'name': 'USD in CNY',
