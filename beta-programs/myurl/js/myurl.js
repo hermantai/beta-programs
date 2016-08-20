@@ -150,6 +150,10 @@ myurl.repo = (function() {
       'url': 'http://xueqiu.com/S/%s',
     },
     {
+      'name': 'US SEC',
+      'url': 'https://www.sec.gov/cgi-bin/browse-edgar?CIK=%s',
+    },
+    {
       'name': 'USD in CNY',
       'url': 'https://www.google.com/#q=%s+usd+in+cny&safe=off',
     },
