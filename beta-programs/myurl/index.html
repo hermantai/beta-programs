@@ -151,10 +151,42 @@
 
       <div role="tabpanel" class="tab-pane" id="about">
         <dl class="col-md-12">
+          <dt>Usage</dt>
+          <dd>
+          <p>
+          MyURL allows you create your own smart URLs. A smart URL is a
+          parameterized URL that allows you to give it an input for specific
+          location to go to, similar to "search engines" in Chrome. The
+          parameter of an URL is represented by "%s". For example, for Finance
+          Yahoo, you can use the parameterized URL
+          "http://finance.yahoo.com/q?s=%s", which when replaced with an input
+          like "MSFT", will become "http://finance.yahoo.com/q?s=MSFT", which
+          goes to Finance Yahoo for the symbol "MSFT". MyURL is most useful in
+          mobile because the lack of such "search engine" in mobile Chrome.
+          </p>
+          <p>
+          In "Config URLs" tab, you can add or remove smart URLs. The JSON box
+          at the bottom part let you import or export your smart URLs. If You
+          press the "Export to the box above" button, your smart URLs appears
+          in the textbox and you can copy and paste it your own file and save
+          it somewhere for backup purpose. Alternative, you can use the
+          "Generate download link for the Smart URLs above" button to download
+          a file that consists of your smart URLs. To restore your smart
+          URLs, you can just paste the text that you backed up into the JSON
+          box, then press the "Import from the box above" button. Because
+          import does not dedup, you may want to delete all your existing
+          smart URLs before doing an import for restore purpose.
+          </p>
+          <p>
+          In mobile, you should use a brower to go to MyURL (Safari for iPhone
+          and Chrome for Android), then choose "Add to Home" to make MyURL like
+          a standalone app for your convenience.
+          </p>
+          </dd>
           <dt>Contact</dt>
           <dd>htaihm@gmail.com</dd>
           <dt>Version</dt>
-          <dd>0.1.3</dd>
+          <dd>0.2.0</dd>
         </dl>
       </div>
     </div>
