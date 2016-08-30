@@ -118,6 +118,10 @@ myurl.repo = (function() {
       'url': 'http://finance.yahoo.com/q/it?s=%s+Insider+Transactions',
     },
     {
+      'name': 'Finance Yahoo Company News RSS',
+      'url': 'http://finance.yahoo.com/rss/headline?s=%s',
+    },
+    {
       'name': 'Nasdaq after hours',
       'url': 'http://www.nasdaq.com/symbol/%s/after-hours'
     },
