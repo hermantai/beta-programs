@@ -159,7 +159,7 @@ myurl.repo = (function() {
     },
     {
       'name': 'aastocks',
-      'url': 'http://www.aastocks.com/en/ltp/rtquote.aspx?symbol=%s'
+      'url': 'http://www.aastocks.com/tc/ltp/rtquote.aspx?symbol=%s'
     },
     {
       'name': '理財通',
