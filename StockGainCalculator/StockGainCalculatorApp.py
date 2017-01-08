@@ -12,6 +12,7 @@ Note:
 """
 
 from FirstSouthWest import FirstSouthWestTransactionGenerator
+from HilltopSecurities import HilltopSecuritiesTransactionGenerator
 from Penson import PensonTransactionGenerator
 
 import StockGainCalculator
@@ -106,10 +107,14 @@ class StockGainCalculatorGui(Frame):
         Label(displayFrame,text='* Double click entry to view the cost history for the sale.').pack(anchor=W)
 
     def add_data_sources(self):
+        self.__add_data_source(
+            'Hilltop Securities csv with comma delimiter',
+            HilltopSecuritiesTransactionGenerator()
+        )
         self.__add_data_source('Penson csv with comma delimiter',PensonTransactionGenerator())
         self.__add_data_source('Stock Gain Calculator XML',transaction.XMLTransactionGenerator())
         self.__add_data_source(
-            'FirstSouthWes csv with comma delimiter',
+            'FirstSouthWest csv with comma delimiter',
             FirstSouthWestTransactionGenerator()
         )
 
