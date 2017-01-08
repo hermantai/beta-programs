@@ -28,3 +28,9 @@ You can double click any entries to see the cost history of the stock. Each entr
 4. Press go.
 5. You see it lists your transactions. Press the download file button on the top right next to the printer icon.
 6. Choose delimited text file, comma delimited, then download.
+
+# Testing
+In the directory "StockGainCalculator"
+
+    export PYTHONPATH=.:"$PYTHONPATH"
+    python -m unittest discover tests/
