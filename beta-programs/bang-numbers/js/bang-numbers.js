@@ -142,6 +142,12 @@ function html_for_table_with_num_columns_equal_numbers_len(numbers) {
     get_accumulated_sums(numbers),
     acc_sum_help
   );
+  avg_help = "Average of all numbers";
+  html += make_table_row_html(
+    "Average",
+    get_average(numbers),
+    avg_help
+  );
   html += make_table_row_html(
     "AccDiffs to 1st",
     get_accumulated_diffs_to_1st_number(numbers),
@@ -250,6 +256,19 @@ function get_accumulated_sums(numbers) {
     sum += numbers[i];
     sums.push(sum);
   }
+  return sums;
+}
+
+
+function get_average(numbers) {
+  var sum = 0.0;
+  for (var i = 0; i < numbers.length; i++) {
+    sum += numbers[i];
+  }
+
+  var sums = create_array_with_repeated_items("", numbers.length - 1);
+
+  sums.push(sum / numbers.length);
   return sums;
 }
 
