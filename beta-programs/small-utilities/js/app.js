@@ -60,3 +60,35 @@ $(function() {
     }
   });  // plain-notepad-textarea on keyup
 });
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
+
+$(function() {
+  // simple-string-replace
+
+  var replace_func = function () {
+    $('#simple-string-replace-newstr').val(
+        $('#simple-string-replace-textarea').val().replaceAll(
+          $('#simple-string-replace-substr').val(),
+          $('#simple-string-replace-newsubstr').val())
+    );
+  }
+
+  var capture_enter_and_replace_func = function (event) {
+			var keycode = (event.keyCode ? event.keyCode : event.which);
+			if(keycode == '13'){
+					replace_func();
+          return true;
+			}
+  };
+
+  // capture enter in input textarea and the newsubstr text box
+	$('#simple-string-replace-textarea').keypress(capture_enter_and_replace_func);
+	$('#simple-string-replace-substr').keypress(capture_enter_and_replace_func);
+	$('#simple-string-replace-newsubstr').keypress(capture_enter_and_replace_func);
+
+  $('#simple-string-replace-button').click(replace_func);
+});
