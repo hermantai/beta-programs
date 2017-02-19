@@ -10,6 +10,7 @@ Note:
     Right now it only takes care of sell and buy of shares transaction.
 
 """
+import csv
 
 from FirstSouthWest import FirstSouthWestTransactionGenerator
 from HilltopSecurities import HilltopSecuritiesTransactionGenerator
@@ -80,6 +81,7 @@ class StockGainCalculatorGui(Frame):
             fileMenu.add_command(label='Export realized gain/loss XML file',command=self.choose_export_xml)
             fileMenu.add_command(label='Export realized gain/loss HTML file',command=self.choose_export_html)
             fileMenu.add_command(label='Export inventory (HTML)',command=self.choose_export_inventory_html)
+            fileMenu.add_command(label='Export inventory (CSV)',command=self.choose_export_inventory_csv)
             fileMenu.add_command(label='Export raw transactions', command=self.choose_export_transactions)
         except _tkinter.TclError: # master cannot add normal menu
             menuFrame = Frame(self)
@@ -93,6 +95,7 @@ class StockGainCalculatorGui(Frame):
             fMenu.add_command(label='Export realized gain/loss XML file',command=self.choose_export_xml)
             fMenu.add_command(label='Export realized gain/loss HTML file',command=self.choose_export_html)
             fMenu.add_command(label='Export inventory (HTML)',command=self.choose_export_inventory_html)
+            fMenu.add_command(label='Export inventory (XML)',command=self.choose_export_inventory_xml)
             fMenu.add_command(label='Export raw transactions', command=self.choose_export_transactions)
 
     def __drawDisplay(self):
@@ -208,6 +211,16 @@ class StockGainCalculatorGui(Frame):
                 showinfo("Export inventory (HTML)", "The file is saved in %s"%export_file)
             except Exception as ex:
                 showerror('Export inventory (HTML) error', ex)
+
+    def choose_export_inventory_csv(self):
+        export_file = asksaveasfilename(initialdir=self.initialdir)
+        if export_file:
+            self.initialdir = os.path.dirname(export_file)
+            try:
+                self.export_inventory_csv(export_file)
+                showinfo("Export inventory (XML)", "The file is saved in %s"%export_file)
+            except Exception as ex:
+                showerror('Export inventory (XML) error', ex)
 
     def choose_export_transactions(self):
         export_file = asksaveasfilename(initialdir=self.initialdir)
@@ -387,6 +400,39 @@ class StockGainCalculatorGui(Frame):
                 outfile.write('\n')
                 outfile.write('</tr>\n')
         outfile.write('</table>\n')
+        outfile.close()
+
+    def export_inventory_csv(self,filename):
+        outfile = open(filename,"w")
+        writer = csv.DictWriter(
+            outfile,
+            [
+                "symbol",
+                "action",
+                "quantity",
+                "price",
+                "net_amount",
+                "time",
+            ],
+        )
+        writer.writeheader()
+
+        for stock,inventory in self.stockGainCalculator.remaining_inventory.items():
+            for inv in inventory:
+                trans = inv[0]
+                remaining_quantity = inv[1]
+
+                row = {
+                    'symbol': trans.symbol,
+                    'action': "buy",
+                    'quantity': remaining_quantity,
+                    'price': trans.price_per_share,
+                    'net_amount': roundToActual(
+                        remaining_quantity * trans.net_amount / trans.num_of_shares
+                    ),
+                    'time': trans.getTimeStr(),
+                }
+                writer.writerow(row)
         outfile.close()
 
     def export_transactions(self,filename):
