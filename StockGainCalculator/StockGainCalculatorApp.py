@@ -15,6 +15,7 @@ import csv
 from FirstSouthWest import FirstSouthWestTransactionGenerator
 from HilltopSecurities import HilltopSecuritiesTransactionGenerator
 from Penson import PensonTransactionGenerator
+from InteractiveBrokersCsv import InteractiveBrokersCsvTransactionGenerator
 from InventoryCsv import InventoryCsvTransactionGenerator
 
 import StockGainCalculator
@@ -118,12 +119,16 @@ class StockGainCalculatorGui(Frame):
         self.__add_data_source('Penson csv with comma delimiter',PensonTransactionGenerator())
         self.__add_data_source('Stock Gain Calculator XML',transaction.XMLTransactionGenerator())
         self.__add_data_source(
-            'FirstSouthWest csv with comma delimiters',
+            'FirstSouthWest csv files',
             FirstSouthWestTransactionGenerator()
         )
         self.__add_data_source(
-            'Exported inventory csv with comma delimiters',
+            'Exported inventory csv files',
             InventoryCsvTransactionGenerator()
+        )
+        self.__add_data_source(
+            'Interactive Brokers csv files',
+            InteractiveBrokersCsvTransactionGenerator()
         )
 
     def __add_data_source(self,name,transGen):
