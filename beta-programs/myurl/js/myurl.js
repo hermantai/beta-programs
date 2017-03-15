@@ -166,6 +166,10 @@ myurl.repo = (function() {
       'url': 'http://www.etnet.com.hk/www/tc/stocks/realtime/quote.php?code=%s'
     },
     {
+      'name': '華富財經',
+      'url': 'http://www.quamnet.com/Quote.action?stockCode=%s&x=0&y=0'
+    },
+    {
       'name': 'USD in CNY',
       'url': 'https://www.google.com/#q=%s+usd+in+cny&safe=off',
     },
