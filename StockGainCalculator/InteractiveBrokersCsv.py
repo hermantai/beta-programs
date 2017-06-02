@@ -25,7 +25,11 @@ class InteractiveBrokersCsvTransactionGenerator(TransactionGenerator):
 
         try:
             for entry in reader:
-                if not entry['Exchange'] == '-':
+                if entry.get('Asset Category') != "Stocks":
+                    continue
+                if 'Exchange' in entry and entry['Exchange'] != '-':
+                    continue
+                if 'Exchange' not in entry and entry['Date/Time'] == "":
                     continue
 
                 dt = datetime.datetime.strptime(entry['Date/Time'], "%Y-%m-%d, %H:%M:%S")
