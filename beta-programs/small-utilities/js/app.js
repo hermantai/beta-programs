@@ -10,6 +10,17 @@ if (!String.prototype.format) {
   };
 }
 
+if (!Number.prototype.pad) {
+	Number.prototype.pad = function(size) {
+		var s = String(this);
+    var size = size || 2;
+		while (s.length < size) {
+			s = "0" + s;
+		}
+		return s;
+	}
+}
+
 function addZeroIfNeeded(num) {
   // add a prefix zero and return a string if num is smaller than 10,
   // otherwise, just return the string of num
@@ -91,4 +102,55 @@ $(function() {
 	$('#simple-string-replace-newsubstr').keypress(capture_enter_and_replace_func);
 
   $('#simple-string-replace-button').click(replace_func);
+});
+
+$(function() {
+  // timestamp-generator
+  var generate_date = function(evt) {
+    var f = "[%Y/%m/%d]";
+    $('#timestamp-generator-input-format').val(f);
+    generate_timestamp(evt);
+  }
+
+  var generate_date_and_time = function(evt) {
+    var f = "[%Y/%m/%d %H:%M:%s]";
+    $('#timestamp-generator-input-format').val(f);
+    generate_timestamp(evt);
+  }
+
+  var generate_custom = function(evt) {
+    generate_timestamp(evt);
+  }
+
+  var generate_timestamp = function (evt) {
+    var year = $('#timestamp-generator-input-year').val();
+    var month = $('#timestamp-generator-input-month').val() - 1;
+    var day = $('#timestamp-generator-input-day').val();
+    var d = new Date();
+    d.setFullYear(year);
+    d.setMonth(month - 1);
+    d.setDate(day);
+
+    generate_timestamp_helper(d, $('#timestamp-generator-input-format').val());
+  }
+
+  var generate_timestamp_helper = function (date, fmt) {
+    s = fmt.replaceAll("%Y", date.getFullYear());
+    s = s.replaceAll("%m", (date.getMonth() + 1).pad(2));
+    s = s.replaceAll("%d", date.getDate().pad(2));
+    s = s.replaceAll("%H", date.getHours().pad(2));
+    s = s.replaceAll("%M", date.getMinutes().pad(2));
+    s = s.replaceAll("%s", date.getSeconds().pad(2));
+
+    $('#timestamp-generator-output').val(s);
+  }
+
+  var d = new Date();
+  $('#timestamp-generator-input-year').val(d.getFullYear());
+  $('#timestamp-generator-input-month').val(d.getMonth() + 1);
+  $('#timestamp-generator-input-day').val(d.getDate());
+
+  $('#timestamp-generator-generate-date').click(generate_date);
+  $('#timestamp-generator-generate-date-and-time').click(generate_date_and_time);
+  $('#timestamp-generator-generate-get-custom').click(generate_custom);
 });

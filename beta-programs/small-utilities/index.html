@@ -114,6 +114,52 @@
       <h2>Text sorting</h2>
       <a href="https://www.online-utility.org/text/sort.jsp">Text sorting</a>
     </div>
+    <div id="timestamp-generator">
+      <h2>Timestamp generator</h2>
+      <p>
+      Generate timestamps for you
+      </p>
+      <form>
+        <div class="form-group">
+          <label for="timestamp-generator-input-year">
+            Year:
+          </label>
+          <input id="timestamp-generator-input-year" type="number" />
+          <label for="timestamp-generator-input-month">
+            Month:
+          </label>
+          <input id="timestamp-generator-input-month" type="number" />
+          <label for="timestamp-generator-input-day">
+            Day:
+          </label>
+          <input id="timestamp-generator-input-day" type="number" />
+        </div>
+        <div class="form-group">
+          <input type="button"
+            id="timestamp-generator-generate-date"
+            value="Get date"
+            />
+          <button id="timestamp-generator-generate-date-and-time" type="button">
+            Get date and time
+          </button>
+          <label for="timestamp-generator-input-format">
+            Custom format:
+          </label>
+          <input id="timestamp-generator-input-format" type="text" />
+          <button id="timestamp-generator-generate-get-custom" type="button">
+            Get custom
+          </button>
+        </div>
+        <div class="form-group">
+          <label for="timestamp-generator-output">
+            Output:
+          </label>
+          <input id="timestamp-generator-output"
+            disabled="disabled"
+            class="form-control" />
+        </div>
+      </form>
+    </div><!-- timestamp-generator -->
   </div>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
