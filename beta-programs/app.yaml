@@ -1,5 +1,3 @@
-application: beta-programs
-version: 1
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -42,6 +40,9 @@ handlers:
 
 - url: /js
   static_dir: js
+
+- url: /tour_of_heros
+  static_dir: tour_of_heros
 
 - url: .*
   script: main.app
