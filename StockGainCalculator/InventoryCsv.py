@@ -42,6 +42,6 @@ class InventoryCsvTransactionGenerator(TransactionGenerator):
             errMsg = "Illegal inventory csv file(s)."
             if entry:
                 errMsg += " Error row: %s. Error: %s" % (entry, ex)
-            raise TransactionGeneratorError(errMsg), None, sys.exc_info()[2]
+            raise TransactionGeneratorError(errMsg) from ex
         file.close()
         return transactions

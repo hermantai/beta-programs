@@ -61,7 +61,7 @@ class FirstSouthWestTransactionGenerator(TransactionGenerator):
             errMsg = "Illegal FirstSouthWest data file."
             if processingTrade:
                 errMsg += " Error row: %s. Error: %s" % (processingTrade, ex)
-            raise TransactionGeneratorError(errMsg), None, sys.exc_info()[2]
+            raise TransactionGeneratorError(errMsg) from ex
         file.close()
         return transactions
 

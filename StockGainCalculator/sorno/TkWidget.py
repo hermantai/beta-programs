@@ -8,7 +8,7 @@ Description:
     Provides resuable Tkinter widgets.
 """
 
-from Tkinter import *
+from tkinter import *
 
 class TkWidget(Frame):
     def __init__(self,parent=None,**options):

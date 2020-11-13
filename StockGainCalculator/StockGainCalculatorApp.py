@@ -20,10 +20,9 @@ from InventoryCsv import InventoryCsvTransactionGenerator
 
 import StockGainCalculator
 import transaction
-from Tkinter import *
-import _tkinter
-from tkFileDialog import askopenfilenames, asksaveasfilename
-from tkMessageBox import showerror,showinfo
+from tkinter import *
+from tkinter.filedialog import askopenfilenames, asksaveasfilename
+from tkinter.messagebox import showerror,showinfo
 import datetime
 import os
 from sorno.TkWidget import ScrolledList
@@ -85,7 +84,7 @@ class StockGainCalculatorGui(Frame):
             fileMenu.add_command(label='Export inventory (HTML)',command=self.choose_export_inventory_html)
             fileMenu.add_command(label='Export inventory (CSV)',command=self.choose_export_inventory_csv)
             fileMenu.add_command(label='Export raw transactions', command=self.choose_export_transactions)
-        except _tkinter.TclError: # master cannot add normal menu
+        except TclError: # master cannot add normal menu
             menuFrame = Frame(self)
             menuFrame.pack(side=TOP,fill=X)
 
