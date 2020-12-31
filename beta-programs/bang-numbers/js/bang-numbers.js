@@ -162,7 +162,10 @@ function html_for_table_with_num_columns_equal_numbers_len(numbers) {
     get_fractions_of_1st_number(numbers),
     "Fractions of the 1st number"
   );
-  html += make_table_row_html("Growth.", get_growths(numbers));
+  html += make_table_row_html(
+    "Growth",
+    get_growths(numbers),
+    "Change of the n'th number from n-1'th number");
   html += make_table_row_html(
     "Comp. Growth", get_compounded_growths(numbers)
   );
@@ -342,7 +345,7 @@ function get_fractions_of_1st_number(numbers) {
 function get_growths(numbers) {
   var fracs = [""]; // Only get the growth starting from the second number
   for (var i = 1; i < numbers.length; i++) {
-    fracs.push((numbers[i] - numbers[i - 1]) / numbers[i]);
+    fracs.push((numbers[i] - numbers[i - 1]) / numbers[i - 1]);
   }
   return fracs;
 }
