@@ -151,26 +151,32 @@ class StockGainCalculatorGui(Frame):
         history = self.get_sale_history(yr)
         history.sort(key=StockGainCalculator.get_sale_history_key)
         self.cost_history = {}
+        running_short_g = 0
+        running_long_g = 0
         for index,h in enumerate(history):
             tran = h[0]
+            self.cost_history[(index,)] = h[1]
             symbol = tran.symbol
             dateStr = tran.time.strftime("%m/%d %X")
             price,quantity,short_g,long_g = (tran.price_per_share, tran.num_of_shares, h[2], h[3])
-            self.cost_history[(str(index),)] = h[1]
+            running_short_g += short_g
+            running_long_g += long_g
             gain_str = "SG: %s, LG: %s" % (short_g,long_g)
+            running_gain_str = "running SG: %s, LG: %s" % (running_short_g, running_long_g)
             fees_per_share = tran.getFees()/quantity
             fees_for_this_tran = roundToActual(fees_per_share*quantity)
             short_sale_indicator = ''
             if tran.account_type == transaction.ACCOUNT_TYPE_SHORT:
                 short_sale_indicator = '(Short Sale)'
-            showText = "%s%s %-10s%s x %s - %s = %s; %30s" % (short_sale_indicator,
+            showText = "%s%s %-10s%s x %s - %s = %s; %30s; %30s" % (short_sale_indicator,
                                                               dateStr,
                                                               symbol,
                                                               price,
                                                               quantity,
                                                               fees_for_this_tran,
                                                               tran.net_amount,
-                                                              gain_str)
+                                                              gain_str,
+                                                              running_gain_str)
             self.show_text_sl.widget.insert(END,showText)
 
     def chooseFile(self):

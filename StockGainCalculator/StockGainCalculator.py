@@ -15,6 +15,7 @@ basic_format = '%(asctime)s %(levelname)s:%(module)s:%(message)s'
 LOG_FILENAME = "StockGainCalculator.log"
 logging.basicConfig(format=basic_format,filename=LOG_FILENAME,level=logging.DEBUG)
 _LOGGER = logging.getLogger(__name__)
+HKD_IN_USD = 7.76
 
 
 class StockGainCalculator:
@@ -124,6 +125,11 @@ class StockGainCalculator:
         # remove used inventory
         for inv in used_inv:
             inventory.remove(inv)
+        if trade.symbol.isdigit():
+            # this is probably a HK stock, so need to convert gain/loss from
+            # hkd to usd
+            short_gain /= Decimal(HKD_IN_USD)
+            long_gain /= Decimal(HKD_IN_USD)
         short_gain = roundToActual(short_gain)
         long_gain = roundToActual(long_gain)
         history.append( (t,bought_history,short_gain,long_gain) )
