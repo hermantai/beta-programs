@@ -15,8 +15,8 @@ class Transaction:
     symbol - a string, the symbol of the stock, it will become upper case in the Transaction
     buy - a boolean, indicate it's a buy or sell transaction, default True
     num_of_shares - an integer, number of shares involved in this transaction
-    price_per_share - a Decimal, market price per share for this transaction, default 0    
-    net_amount - a Decimal, net amount of transaction, which includes every fees    
+    price_per_share - a Decimal, market price per share for this transaction, default 0
+    net_amount - a Decimal, net amount of transaction, which includes every fees
     time - a datetime.datetime, execution time of the transaction, which has both date and time
     account_type - the kind of account, short or long
     """
@@ -28,7 +28,7 @@ class Transaction:
         self.net_amount = net_amount
         self.time = time
         self.account_type = account_type
-    
+
     def __lt__(self,y):
         if self.account_type < y.account_type:
             return True
@@ -55,17 +55,16 @@ class Transaction:
         self.net_amount == other.net_amount and
         self.time == other.time and
         self.account_type == other.account_type)
-        
+
     def __ne__(self,other):
         return not self.__eq__(other)
-    
+
     def getFees(self):
         if(self.buy):
             return self.net_amount-self.price_per_share*self.num_of_shares
         else:
-            return self.price_per_share*self.num_of_shares-self.net_amount
-        
-            
+            return self.price_per_share*abs(self.num_of_shares)-self.net_amount
+
     def getTimeStr(self):
         return self.time.strftime('%Y/%m/%d %H:%M:%S')
 
@@ -85,16 +84,16 @@ class TransactionGeneratorError(Exception):
         self.message = msg
     def __str__(self):
         return self.message
-    
+
 class XMLTransactionGenerator(TransactionGenerator):
     def __init__(self,xml=None):
         TransactionGenerator.__init__(self)
         self.xml = xml
-        
+
     def get_transactions(self,file=None):
         ret = []
         if file is not None:
-            doc = xml.dom.minidom.parse(file) 
+            doc = xml.dom.minidom.parse(file)
         else:
             doc = xml.dom.minidom.parseString(self.xml)
         if doc.documentElement.tagName != "transactions":
@@ -107,14 +106,14 @@ class XMLTransactionGenerator(TransactionGenerator):
         if file is not None:
             file.close()
         return ret
-    
+
     def __createTransaction(self,tranDom):
         """
         Take a transaction represented by a dom object, return a Transaction object
         """
         symbol = self.__getTextFromNode(tranDom.getElementsByTagName("symbol")[0])
         symbol = symbol.strip()
-        buy = self.__getTextFromNode(tranDom.getElementsByTagName("buy")[0])        
+        buy = self.__getTextFromNode(tranDom.getElementsByTagName("buy")[0])
         buy = True if buy.strip().lower() == "true" else False
         quantity = self.__getTextFromNode(tranDom.getElementsByTagName("quantity")[0])
         quantity = int(quantity)
@@ -132,14 +131,14 @@ class XMLTransactionGenerator(TransactionGenerator):
         else:
             account_type = ACCOUNT_TYPE_LONG
         return Transaction(symbol,buy,quantity,price,net_amount,time, account_type)
-    
+
     def __getTextFromNode(self,node):
         return self.__getText(node.childNodes)
-    
+
     def __getText(self,nodelist):
         rc = []
         for node in nodelist:
             if node.nodeType == node.TEXT_NODE:
                 rc.append(node.data)
-        return ''.join(rc) 
-        
+        return ''.join(rc)
+

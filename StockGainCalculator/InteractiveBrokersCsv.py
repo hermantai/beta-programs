@@ -44,6 +44,9 @@ class InteractiveBrokersCsvTransactionGenerator(TransactionGenerator):
                     # Hong Kong stock transactions do not have time
                     dt = datetime.datetime.strptime(entry['Date/Time'], "%Y-%m-%d")
                 quantity = int(self._fix_number(entry['Quantity']))
+                if is_options:
+                    # 100 units per option
+                    quantity *= 100
                 is_buy = quantity > 0
                 quantity = abs(quantity)
                 gross_proceeds = abs(

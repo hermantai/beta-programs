@@ -61,25 +61,55 @@ class StockGainCalculator:
                 _LOGGER.debug("Processing %s" % stock)
             trans = self.transactions[stock]
             inventory = []
+            deferred_sales = []
             for t in trans:
                 if t.buy:
                     inventory.append([t,t.num_of_shares])
                 else:
-                    _LOGGER.debug("inventory for %s" % stock)
-                    _LOGGER.debug(str(inventory))
-                    # this is a sale
-                    sg,lg = self.__process_trade(t,inventory)
-                    self.short_gains[t.time.year] = self.short_gains.get(t.time.year,Decimal(0)) + sg
-                    self.long_gains[t.time.year] = self.long_gains.get(t.time.year,Decimal(0)) + lg
+                    deferred_sales.append(t)
+
+            for t in deferred_sales:
+                _LOGGER.debug("Process sales: %s", t)
+                _LOGGER.debug("inventory for %s" % stock)
+                _LOGGER.debug(str(inventory))
+                sg, lg = self.__process_trade(
+                    t,
+                    inventory)
+                self.short_gains[t.time.year] = self.short_gains.get(t.time.year,Decimal(0)) + sg
+                self.long_gains[t.time.year] = self.long_gains.get(t.time.year,Decimal(0)) + lg
+
             # store the remaining inventory of the stock
             self.remaining_inventory[stock] = inventory
         self.proceeded = True
 
-    def __process_trade(self,trade,inventory):
+    def __process_trade(
+            self,
+            trade,
+            inventory):
+        """Process a trade (sales) transaction
+
+        Args:
+            trade (Transaction): the trade to process
+            inventory (A list of [trade, num_of_shares]): num_of_shares is
+                trade.num_of_shares
+
+        Returns:
+            [
+                short-term gain (float),
+                long-term gain (float),
+            ]
+
+        Side effects:
+            1) self.sale_history[trade.time.year] is appended with the sales
+            transactions.
+
+            2) The inventory maybe appended with the trade if the quantity
+            in the trade exceeds the inventory.
+
         """
-        bought_history: each entry is (transaction, num_of_shares)
-        each entry of history:(transaction, bought_history, short_gain, long_gain)
-        """
+        # bought_history: each entry is (transaction, num_of_shares)
+        # each entry of history:(transaction, bought_history, short_gain, long_gain)
+
         # determine short/long gain/loss
         t = trade
         if t.time.year in self.sale_history:
@@ -96,6 +126,23 @@ class StockGainCalculator:
         if t.account_type == transaction.ACCOUNT_TYPE_SHORT:
             history.append( (t,bought_history,short_gain,long_gain) )
             return short_gain,long_gain
+
+        # check if we have enough inventory to cover the trade, if not,
+        # defer the trade
+        num_of_shares_in_inventory = sum([inv[1] for inv in inventory])
+        if quantity > num_of_shares_in_inventory:
+            msg = (
+                ("Not enough inventory to handle transaction[%s]. Remaining"
+                    + " quantity: %d.") % (t, quantity)
+            )
+            _LOGGER.info(msg + " Trade becomes the inventory.")
+            # change to negative because an inventory deficit should be
+            # negative
+            t.num_of_shares *= -1
+            quantity *= -1
+            inventory.append([t, quantity])
+            return short_gain, long_gain
+
         for inv in inventory:
             t_in_inv = inv[0]
             # determine the quantity used for this inventory
@@ -117,9 +164,13 @@ class StockGainCalculator:
             else:
                 long_gain += gain
             if quantity == 0: break
+
+        deferred_trade = None
         if quantity != 0:
+            # Should be impossible because we have taken care of this before
+            # reaching here.
             raise StockGainCalculatorError(
-                "Not enough inventory to handle transaction[%s]. Remaining quantity: %d."
+                "Impossible! Not enough inventory to handle transaction[%s]. Remaining quantity: %d."
                 % (t, quantity))
 
         # remove used inventory
