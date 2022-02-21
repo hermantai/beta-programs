@@ -25,14 +25,24 @@ class InteractiveBrokersCsvTransactionGenerator(TransactionGenerator):
 
         try:
             for entry in reader:
-                if entry.get('Asset Category') != "Stocks":
+                is_stock = False
+                is_options = False
+                if entry.get('Asset Category') == "Stocks":
+                    is_stock = True
+                elif entry.get('Asset Category').endswith("Options"):
+                    is_options = True
+                else:
                     continue
                 if 'Exchange' in entry and entry['Exchange'] != '-':
                     continue
                 if 'Exchange' not in entry and entry['Date/Time'] == "":
                     continue
 
-                dt = datetime.datetime.strptime(entry['Date/Time'], "%Y-%m-%d, %H:%M:%S")
+                try:
+                    dt = datetime.datetime.strptime(entry['Date/Time'], "%Y-%m-%d, %H:%M:%S")
+                except:
+                    # Hong Kong stock transactions do not have time
+                    dt = datetime.datetime.strptime(entry['Date/Time'], "%Y-%m-%d")
                 quantity = int(self._fix_number(entry['Quantity']))
                 is_buy = quantity > 0
                 quantity = abs(quantity)
